@@ -55,11 +55,13 @@ bpoperator: | BIGSEQ { Ast.T.Seq } | BIGNONDET { Ast.T.U }
 pure_term:
 | name = CNAME vs = otuple_list(pure_term) { Ast.T.Fun (name, vs) }
 | vs = ttuple_list(pure_term) { Ast.T.Fun ("", vs) }
+| LPAREN RPAREN { Ast.T.Fun ("", []) }
 | v = VNAME { Ast.T.Var v }
 
 term:
 | name = CNAME ts = otuple_list(term) { Ast.T.Fun (name, ts)  }
 | ts = ttuple_list(term) { Ast.T.Fun ("", ts)  }
+| LPAREN RPAREN { Ast.T.Fun ("", []) }
 | v = VNAME { Ast.T.Var v }
 | e = cexpr { Ast.T.Int e }
 
@@ -67,7 +69,7 @@ set:
 | s = inner_set { s }
 
 outer_set:
-| LBRACE cs = separated_nonempty_list(COMMA, tuple) vs = loption(MID vs = vdecls { vs }) RBRACE { Ast.T.Set (cs, vs) }
+| LBRACE cs = separated_list(COMMA, tuple) vs = loption(MID vs = vdecls { vs }) RBRACE { Ast.T.Set (cs, vs) }
 | c = callable { Ast.T.Name c }
 | RPAREN s = inner_set RPAREN { s }
 
