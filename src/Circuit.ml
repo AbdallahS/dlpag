@@ -12,15 +12,19 @@ struct
   let callable (n, cs) = match cs with
     | [] -> Ast.Print.cname n
     | _ :: _ -> sprintf "%s(%s)" (Ast.Print.cname n) (Print.list' "" ", " "" ground_term cs)
-  let rec formula = function
-    | ListF (a, fs) -> Print.list' "" (sprintf " %s " (Ast.Print.foperator a)) "" inner_formula fs
-    | CallF _ | Top | Neg _ | Diamond _ as f -> inner_formula f
-  and inner_formula = function
+
+  let rec formula f = inner_formula f
+  and outer_formula = function
     | CallF a -> callable a
     | Top -> "\\top"
-    | Neg f -> sprintf "\\neg %s" (inner_formula f)
-    | Diamond (p, f) -> sprintf "<%s>%s" (program p) (inner_formula f)
-    | ListF _  as f -> sprintf "(%s)" (formula f)
+    | Neg f -> sprintf "\\neg %s" (outer_formula f)
+    | Diamond (p, f) -> sprintf "<%s>%s" (program p) (outer_formula f)
+    | ListF (_, f :: []) -> outer_formula f
+    | ListF (a, []) -> sprintf "(%s [])" (Ast.Print.foperator a)
+    | ListF _  as f -> sprintf "(%s)" (inner_formula f)
+  and inner_formula = function
+    | ListF (a, fs) -> Print.list' "" (sprintf " %s " (Ast.Print.foperator a)) "" outer_formula fs
+    | CallF _ | Top | Neg _ | Diamond _ as f -> outer_formula f
   and program = function
     | ListP (a, ps) -> Print.list' "" (sprintf " %s " (Ast.Print.poperator a)) "" inner_program ps
     | CallP _ | Assign _ | Test _ | Converse _ | Kleene _ as p -> inner_program p
