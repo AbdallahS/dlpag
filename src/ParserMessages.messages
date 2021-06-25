@@ -275,14 +275,14 @@ file: GROUND COLON CNAME DEFINE LBRACE WHERE
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-file: GROUND COLON CNAME DEFINE RPAREN CNAME RBRACE
+file: GROUND COLON CNAME DEFINE LPAREN CNAME RBRACE
 ##
 ## Ends in an error in state: 115.
 ##
-## outer_set -> RPAREN inner_set . RPAREN [ UNION SETMINUS RPAREN RBRACE INTERSECT DOT COMMA COLON ]
+## outer_set -> LPAREN inner_set . RPAREN [ UNION SETMINUS RPAREN RBRACE INTERSECT DOT COMMA COLON ]
 ##
 ## The known suffix of the stack is as follows:
-## RPAREN inner_set
+## LPAREN inner_set
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
@@ -296,14 +296,14 @@ file: GROUND COLON CNAME DEFINE RPAREN CNAME RBRACE
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-file: GROUND COLON CNAME DEFINE RPAREN WHERE
+file: GROUND COLON CNAME DEFINE LPAREN WHERE
 ##
 ## Ends in an error in state: 57.
 ##
-## outer_set -> RPAREN . inner_set RPAREN [ UNION SETMINUS RPAREN RBRACE INTERSECT DOT COMMA COLON ]
+## outer_set -> LPAREN . inner_set RPAREN [ UNION SETMINUS RPAREN RBRACE INTERSECT DOT COMMA COLON ]
 ##
 ## The known suffix of the stack is as follows:
-## RPAREN
+## LPAREN
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
