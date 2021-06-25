@@ -77,7 +77,7 @@ let rec set gmap vmap : Ast.T.set -> GTermSet.t = function
      let maps = vdecls gmap vmap vs in
      let treat_tuple t : GTermSet.t = unions (List.map (fun m -> tuple gmap m t) maps) in
      unions (List.map treat_tuple ts)
- | Ast.T.Name c -> CMap.find (callable gmap vmap c) gmap (* SMap.find c gmap*)
+ | Ast.T.Name c -> if not (CMap.mem (callable gmap vmap c) gmap) then failwith (sprintf "Set name %s unknown." (Ast.Print.callable c)); CMap.find (callable gmap vmap c) gmap (* SMap.find c gmap*)
  | Ast.T.List (o, s, ss) ->
     let s' = set gmap vmap s
     and ss' = List.map (set gmap vmap) ss in
@@ -114,9 +114,9 @@ and tuple gmap vmap : Ast.T.tuple -> GTermSet.t  = function
 and term gmap vmap = function
   | Fun (c, ts) -> Fun (c, List.map (term gmap vmap) ts)
   | Int e -> Int (expr gmap vmap e)
-  | Ast.T.Var n -> if not (SMap.mem n vmap) then failwith (sprintf "unknown %s\n" n); assert (SMap.mem n vmap); SMap.find n vmap
+  | Ast.T.Var n -> if not (SMap.mem n vmap) then failwith (sprintf "term variable %s unknown\n" n); assert (SMap.mem n vmap); SMap.find n vmap
 and expr gmap vmap : Ast.T.expr -> int = function
-  | Ast.T.Var n -> if not (SMap.mem n vmap) then failwith (sprintf "unknown %s\n" n); assert (SMap.mem n vmap); (match SMap.find n vmap with | Int i -> i | Fun _ as g -> failwith (sprintf "Variable %s ground to a non-int %s" n (Print.ground_term g)))
+  | Ast.T.Var n -> if not (SMap.mem n vmap) then failwith (sprintf "expression variable %s unknown\n" n); assert (SMap.mem n vmap); (match SMap.find n vmap with | Int i -> i | Fun _ as g -> failwith (sprintf "Variable %s ground to a non-int %s" n (Print.ground_term g)))
   | Int i -> i
   | ListE (eop, e, es) -> perform_eop eop (List.map (expr gmap vmap) (e :: es))
   | VarE (eop, vs, e) ->
