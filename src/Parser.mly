@@ -78,6 +78,7 @@ inner_set:
 | s = outer_set { s }
 
 constraints:
+| LPAREN c = constraints RPAREN { c }
 | t1 = term r = roperator t2 = term { Ast.T.Relation (r, t1, t2) }
 | t = term NOTIN s = set { Ast.T.Notin (t, s)}
 
