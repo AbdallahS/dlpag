@@ -1,11 +1,9 @@
 grounding:
 
 formula:
-psi := a.
+psi := \neg b.
 
 program:
 
 main:
 psi.
-
-% expected : false

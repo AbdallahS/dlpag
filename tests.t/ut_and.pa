@@ -1,11 +1,9 @@
 grounding:
 
 formula:
-psi := <a <- \top> a.
+psi := <a <- \top> b \and a.
 
 program:
 
 main:
 psi.
-
-% expected : true

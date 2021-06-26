@@ -12,5 +12,3 @@ ini := a <- \top \seq b <- \bot.
 
 main:
 psi.
-
-% expected : true

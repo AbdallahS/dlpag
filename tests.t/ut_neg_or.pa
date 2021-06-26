@@ -1,0 +1,9 @@
+grounding:
+
+formula:
+psi := \neg (a \or b).
+
+program:
+
+main:
+psi.

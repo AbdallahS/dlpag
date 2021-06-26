@@ -1,0 +1,9 @@
+grounding:
+
+formula:
+psi := a.
+
+program:
+
+main:
+psi.

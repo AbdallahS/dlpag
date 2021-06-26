@@ -1,13 +1,10 @@
 grounding:
 
 formula:
-psi :=  <init> phi.
-phi := a \or b.
+psi := <init \star> a.
 
 program:
 init := a <- \top.
 
 main:
 psi.
-
-% expected : true

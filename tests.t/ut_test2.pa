@@ -7,5 +7,3 @@ program:
 
 main:
 psi.
-
-% expected : true

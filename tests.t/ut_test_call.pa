@@ -8,5 +8,3 @@ program:
 
 main:
 psi.
-
-% expected : false
