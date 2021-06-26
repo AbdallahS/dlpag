@@ -1,0 +1,22 @@
+(ocamllex Lexer)
+(menhir
+ (flags --table --explain)
+ (modules Parser))
+
+(rule
+ (targets ParserMessages.ml)
+ (deps Parser.messages Parser.mly)
+ (action  (with-stdout-to %{targets} (run menhir --compile-errors %{deps}))))
+
+
+;(rule
+; (targets Parser.messages)
+; (deps Parser.mly)
+; (action  (with-stdout-to %{targets} (run menhir --list-errors %{deps}))))
+
+(library
+  (name lib)
+;  (public_name dlpag)
+  (synopsis "A library for parsing BNF-like grammars and generating strings")
+  (libraries menhirLib tsort)
+  (flags :standard -color always -safe-string -warn-error -a+8 -w -50))

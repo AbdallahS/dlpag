@@ -1,4 +1,5 @@
 open Printf
+open Lib
 
 let update reference value = reference := value
 let get () =
@@ -45,8 +46,8 @@ let ground g =
 
 let ground_d g =
   let f = Formula.file g in
-  let d = Desugar.formula f in
-  (*printf "%s\n" (Desugar.Print.formula d);*)
+  let _d = Desugar.formula f in
+  (*printf "%s\n" (Desugar.Print.formula _d);*)
   ()
 
 module S = Solve

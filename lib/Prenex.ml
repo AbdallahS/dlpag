@@ -1,4 +1,4 @@
-open Printf
+(*open Printf
 
 type callable = Circuit.callable * int
 type qf_formula = Atom of (bool * QBF.callable) | ListQ of (Ast.foperator * qf_formula list) | Xor of (qf_formula * qf_formula) | Ite of (qf_formula * qf_formula * qf_formula)
@@ -12,3 +12,4 @@ let rec turn = function
   | QBF.ListQ (, fs) -> 
   | QBF.Xor (f1, f2) -> 
   | QBF.Ite (f1, f2, f3) -> 
+*)

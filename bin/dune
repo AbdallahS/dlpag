@@ -1,0 +1,5 @@
+(executable
+ (name Dlpag)
+; (public_name dlpag)
+ ;(flags (-ccopt -static))
+ (libraries lib))
