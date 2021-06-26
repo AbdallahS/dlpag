@@ -1,5 +1,5 @@
 open Printf
-open Lib
+open Dlpag
 
 let update reference value = reference := value
 let get () =
