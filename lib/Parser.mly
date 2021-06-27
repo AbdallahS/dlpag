@@ -63,7 +63,7 @@ term:
 | ts = ttuple_list(term) { Ast.T.Fun ("", ts)  }
 | LPAREN RPAREN { Ast.T.Fun ("", []) }
 | v = VNAME { Ast.T.Var v }
-| e = cexpr { Ast.T.Int e }
+| e = cexpr { Ast.T.Exp e }
 
 set:
 | s = inner_set { s }
@@ -96,19 +96,19 @@ tuple:
 cexpr:
 | l = separated_many_slist(eoperator, inner_expr) { Ast.T.ListE l }
 | l = separated_many_slist(MINUS, inner_expr) { let ((), h, r) = l in Ast.T.Subtract (h, r) }
-| o = beoperator vs = vdecls COLON f = expr { Ast.T.VarE (o, vs, f) }
+| o = beoperator vs = vdecls COLON f = expr { Ast.T.BigE (o, vs, f) }
 | LPAREN e = expr RPAREN { e }
 | i = INT { Ast.T.Int i }
 | MINUS i = INT { Ast.T.Int (-i) }
 expr:
 | l = separated_many_slist(eoperator, inner_expr) { Ast.T.ListE l }
 | l = separated_many_slist(MINUS, inner_expr) { let ((), h, r) = l in Ast.T.Subtract (h, r) }
-| o = beoperator vs = vdecls COLON f = expr { Ast.T.VarE (o, vs, f) }
+| o = beoperator vs = vdecls COLON f = expr { Ast.T.BigE (o, vs, f) }
 | e = inner_expr { e }
 
 inner_expr:
 | LPAREN e = expr RPAREN { e }
-| n = VNAME { Ast.T.Var n }
+| n = VNAME { Ast.T.VarE n }
 | i = INT { Ast.T.Int i }
 | MINUS i = INT { Ast.T.Int (-i) }
 
@@ -130,7 +130,7 @@ outer_formula:
 | LPAREN f = inner_formula RPAREN { f }
 inner_formula:
 | l = separated_many_slist(foperator, outer_formula) { Ast.T.ListF l }
-| o = bfoperator vs = vdecls COLON f = inner_formula { Ast.T.VarF (o, vs, f) }
+| o = bfoperator vs = vdecls COLON f = inner_formula { Ast.T.BigF (o, vs, f) }
 | f = outer_formula { f }
 
 program:
@@ -144,7 +144,7 @@ outer_program:
 | LPAREN p = inner_program RPAREN { p }
 inner_program:
 | l = separated_many_slist(poperator, outer_program) { Ast.T.ListP l }
-| o = bpoperator vs = vdecls COLON p = inner_program { Ast.T.VarP (o, vs, p) }
+| o = bpoperator vs = vdecls COLON p = inner_program { Ast.T.BigP (o, vs, p) }
 | p = outer_program { p }
 
 main_decl:

@@ -8,19 +8,19 @@ type poperator = Seq | U
 type roperator = Eq | Neq | Lt | Gt | Leq | Geq
 type soperator = Union | Intersect | Setminus
 
-type pure_term = Var of vname | Fun of (cname * pure_term list) | Int of int
+type pure_term = Fun of (cname * pure_term list) | Int of int | Var of vname
 
 type set = Set of (tuple list * vdecls) | Name of callable | List of (soperator * set * set list)
 and vdecls = vdecl list
 and vdecl = FromSet of (pure_term * set) | Constraint of constraints
 and constraints = Relation of (roperator * term * term) | Notin of (term * set)
-and term = Fun of (cname * term list) | Int of expr | Var of vname
+and term = Exp of expr | Fun of (cname * term list) | Var of vname
 and tuple = Term of term | Range of (expr * expr)
-and expr = Var of vname | Int of int | ListE of (eoperator * expr * expr list) | VarE of (eoperator * vdecls * expr) | Subtract of (expr * expr list)
+and expr = VarE of vname | Int of int | ListE of (eoperator * expr * expr list) | BigE of (eoperator * vdecls * expr) | Subtract of (expr * expr list)
 and callable = cname * term list
 
-type formula = CallF of callable | Top | Neg of formula | ListF of (foperator * formula * formula list) | VarF of (foperator * vdecls * formula) | Diamond of (program * formula)
-and program  = CallP of callable | Assign of (callable * formula) | Test of formula | ListP of (poperator * program * program list) | VarP of (poperator * vdecls * program) | Converse of program | Kleene of program
+type formula = CallF of callable | Top | Neg of formula | ListF of (foperator * formula * formula list) | BigF of (foperator * vdecls * formula) | Diamond of (program * formula)
+and program  = CallP of callable | Assign of (callable * formula) | Test of formula | ListP of (poperator * program * program list) | BigP of (poperator * vdecls * program) | Converse of program | Kleene of program
 
 type 'a decl = vdecls * callable * 'a
 type file = set decl list * formula decl list * program decl list * callable

@@ -15,16 +15,16 @@ struct
 
   let rec formula f = inner_formula f
   and outer_formula = function
-    | CallF a -> callable a
     | Top -> "\\top"
+    | CallF a -> callable a
     | Neg f -> sprintf "\\neg %s" (outer_formula f)
     | Diamond (p, f) -> sprintf "<%s>%s" (program p) (outer_formula f)
     | ListF (_, f :: []) -> outer_formula f
     | ListF (a, []) -> sprintf "(%s [])" (Ast.Print.foperator a)
     | ListF _  as f -> sprintf "(%s)" (inner_formula f)
   and inner_formula = function
+    | Top | CallF _ | Neg _ | Diamond _ as f -> outer_formula f
     | ListF (a, fs) -> Print.list' "" (sprintf " %s " (Ast.Print.foperator a)) "" outer_formula fs
-    | CallF _ | Top | Neg _ | Diamond _ as f -> outer_formula f
   and program = function
     | ListP (a, ps) -> Print.list' "" (sprintf " %s " (Ast.Print.poperator a)) "" inner_program ps
     | CallP _ | Assign _ | Test _ | Converse _ | Kleene _ as p -> inner_program p
@@ -117,13 +117,13 @@ and tuple gmap vmap : Ast.T.tuple -> GTermSet.t  = function
 
 and term gmap vmap = function
   | Fun (c, ts) -> Fun (c, List.map (term gmap vmap) ts)
-  | Int e -> Int (expr gmap vmap e)
+  | Exp e -> Int (expr gmap vmap e)
   | Ast.T.Var n -> if not (SMap.mem n vmap) then failwith (sprintf "term variable %s unknown\n" n); assert (SMap.mem n vmap); SMap.find n vmap
 and expr gmap vmap : Ast.T.expr -> int = function
-  | Ast.T.Var n -> if not (SMap.mem n vmap) then failwith (sprintf "expression variable %s unknown\n" n); assert (SMap.mem n vmap); (match SMap.find n vmap with | Int i -> i | Fun _ as g -> failwith (sprintf "Variable %s ground to a non-int %s" n (Print.ground_term g)))
+  | Ast.T.VarE n -> if not (SMap.mem n vmap) then failwith (sprintf "expression variable %s unknown\n" n); assert (SMap.mem n vmap); (match SMap.find n vmap with | Int i -> i | Fun _ as g -> failwith (sprintf "Variable %s ground to a non-int %s" n (Print.ground_term g)))
   | Int i -> i
   | ListE (eop, e, es) -> perform_eop eop (List.map (expr gmap vmap) (e :: es))
-  | VarE (eop, vs, e) ->
+  | BigE (eop, vs, e) ->
      let vmaps = vdecls gmap vmap vs in
      let ints = List.map (fun m -> expr gmap m e) vmaps in
      perform_eop eop ints
@@ -139,18 +139,18 @@ let rec formula gmap vmap : Ast.T.formula -> T.formula = function
   | Top -> Top
   | Neg f -> Neg (formula gmap vmap f)
   | ListF (fop, f, fs) -> ListF (fop, List.map (formula gmap vmap) (f :: fs))
-  | VarF (fop, vs, f) ->
+  | BigF (fop, vs, f) ->
      let vmaps = vdecls gmap vmap vs in
      let fs = List.map (fun m -> formula gmap m f) vmaps in
      ListF (fop, fs)
   | Diamond (p, f) -> Diamond (program gmap vmap p, formula gmap vmap f)
 
 and program gmap vmap : Ast.T.program -> T.program = function
-  | Ast.T.CallP c -> CallP (callable gmap vmap c)
-  | Assign (c, f) -> Assign (callable gmap vmap c, formula gmap vmap f)
+  | Ast.T.Assign (c, f) -> Assign (callable gmap vmap c, formula gmap vmap f)
+  | CallP c -> CallP (callable gmap vmap c)
   | Test f -> Test (formula gmap vmap f)
   | ListP (pop, p, ps) -> ListP (pop, List.map (program gmap vmap) (p :: ps))
-  | VarP (pop, vs, p) ->
+  | BigP (pop, vs, p) ->
      let vmaps = vdecls gmap vmap vs in
      let ps = List.map (fun m -> program gmap m p) vmaps in
      ListP (pop, ps)

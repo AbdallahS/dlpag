@@ -61,34 +61,34 @@ struct
     | Range (e1, e2) -> sprintf "%s..%s" (expr e1) (expr e2)
   and term : term -> string = function
     | Fun (c, ts) -> sprintf "%s%s" c (list_tuple term ts)
-    | Int e -> expr e
+    | Exp e -> expr e
     | Var n -> n
   and expr = function
     | ListE (a, e, es) -> Print.list' "" (sprintf " %s " (eoperator a)) "" inner_expr (e :: es)
-    | VarE (a, vs, e) -> sprintf "%s %s, %s" (bigeoperator a) (vdecls vs) (expr e)
+    | BigE (a, vs, e) -> sprintf "%s %s, %s" (bigeoperator a) (vdecls vs) (expr e)
     | Subtract (v, vs) -> Print.list' "" " - " "" inner_expr (v :: vs)
-    | Var _ | Int _ as e -> inner_expr e
+    | VarE _ | Int _ as e -> inner_expr e
   and inner_expr = function
-    | Var n -> n
+    | VarE n -> n
     | Int i -> Print.int i
-    | ListE _ | VarE _ | Subtract _ as e -> sprintf "(%s)" (expr e)
+    | ListE _ | BigE _ | Subtract _ as e -> sprintf "(%s)" (expr e)
   and callable (n, ts) = match ts with
     | [] -> cname n
     | _ :: _ -> sprintf "%s(%s)" n (Print.list' "" ", " "" term ts)
 
   let rec formula = function
+    | Top | CallF _ | Neg _ | Diamond _ as f -> inner_formula f
     | ListF (a, f, fs) -> Print.list' "" (sprintf " %s " (foperator a)) "" inner_formula (f :: fs)
-    | VarF (a, vs, f) -> sprintf "%s %s, %s" (bigfoperator a) (vdecls vs) (formula f)
-    | CallF _ | Top | Neg _ | Diamond _ as f -> inner_formula f
+    | BigF (a, vs, f) -> sprintf "%s %s, %s" (bigfoperator a) (vdecls vs) (formula f)
   and inner_formula = function
-    | CallF a -> callable a
     | Top -> "\\top"
+    | CallF a -> callable a
     | Neg f -> sprintf "\\neg %s" (inner_formula f)
     | Diamond (p, f) -> sprintf "<%s>%s" (program p) (inner_formula f)
-    | ListF _ | VarF _  as f -> sprintf "(%s)" (formula f)
+    | ListF _ | BigF _  as f -> sprintf "(%s)" (formula f)
   and program = function
     | ListP (a, p, ps) -> Print.list' "" (sprintf " %s " (poperator a)) "" inner_program (p :: ps)
-    | VarP (a, vs, p) -> sprintf "%s %s, %s" (bigpoperator a) (vdecls vs) (program p)
+    | BigP (a, vs, p) -> sprintf "%s %s, %s" (bigpoperator a) (vdecls vs) (program p)
     | CallP _ | Assign _ | Test _ | Converse _ | Kleene _ as p -> inner_program p
   and inner_program = function
     | CallP a -> callable a
@@ -96,7 +96,7 @@ struct
     | Test f -> sprintf "%s?" (formula f)
     | Converse p -> sprintf "%s^" (program p)
     | Kleene p -> sprintf "%s*" (program p)
-    | ListP _ | VarP _ as p -> sprintf "(%s)" (program p)
+    | ListP _ | BigP _ as p -> sprintf "(%s)" (program p)
 
   let forall_decls vs = match vs with
     | [] -> ""

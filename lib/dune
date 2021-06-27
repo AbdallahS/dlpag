@@ -11,7 +11,7 @@
 (library
   (name dlpag)
   (public_name dlpag)
-  (synopsis "A library for parsing BNF-like grammars and generating strings")
+  (synopsis "A library for parsing and solving Lifted DL-PA formulas and programs")
   (libraries menhirLib tsort)
   (flags :standard -color always -safe-string -warn-error -a+8 -w -50))
 
