@@ -10,6 +10,24 @@ type file = formula decl list * program decl list * callable
 module CMap = Map.Make (struct type t = Circuit.T.callable let compare = compare end)
 module CSet = Set.Make (struct type t = Circuit.T.callable let compare = compare end)
 
+module P = Print
+module Print =
+struct
+  let rec formula = function
+    | CallF i -> sprintf "F%d" i
+    | Atom i -> sprintf "A%d" i
+    | Neg f -> sprintf "-%s" (formula f)
+    | ListF (o, fs) -> sprintf "(%s %s)" (Ast.Print.foperator o) (P.list formula fs)
+    | Diamond (p, f) -> sprintf "<%s>%s" (program p) (formula f)
+  and program = function
+    | CallP i -> sprintf "P%d" i
+    | Assign (i, f) -> sprintf "A%d <- %s" i (formula f)
+    | Test f -> sprintf "?%s?" (formula f)
+    | ListP (o, ps) -> sprintf "(%s %s)" (Ast.Print.poperator o) (P.list program ps)
+    | Converse p -> assert false
+    | Kleene p -> sprintf "%s\star" (program p)
+end
+
 let rec formula (mapa, mapf, mapp) = function
   | Circuit.T.CallF c -> if CMap.mem c mapf then CallF (CMap.find c mapf) else (assert (CMap.mem c mapa); Atom (CMap.find c mapa))
   | Top -> ListF (Ast.T.Conj, [])
@@ -53,7 +71,7 @@ let convert_to_ints (fdecs, pdecs, call) =
   assert (List.mem call (List.map fst fdecs));
   assert (CSet.for_all (fun c -> List.mem c (List.map fst fdecs)) setf);
   let undeclared_progs = CSet.filter (fun c -> not (List.mem c (List.map fst pdecs))) setp in
-  if undeclared_progs <> CSet.empty then failwith (sprintf "Error: Undeclared program names %s\n" (Print.unspaces Circuit.Print.callable (CSet.elements undeclared_progs)));
+  if undeclared_progs <> CSet.empty then failwith (sprintf "Error: Undeclared program names %s\n" (P.unspaces Circuit.Print.callable (CSet.elements undeclared_progs)));
   assert (CSet.for_all (fun c -> List.mem c (List.map fst pdecs)) setp);
 (*  assert (List.length fdecs > 0 && List.length pdecs > 0);*)
   let array_fdecs = Array.of_list fdecs
@@ -77,7 +95,7 @@ struct
   let compare = compare
   let test_atom v a = v.(a)
   let copy = Array.copy
-  let print a = "a" ^ Print.array (sprintf "%b") a
+  let print a = "a" ^ P.array (sprintf "%b") a
 end
 
 module VSet = Set.Make (Valuation)
@@ -102,19 +120,21 @@ and naive_p domain valuation = function
   | ListP (Ast.T.Seq, p :: ps) ->
      let first = naive_p domain valuation p in
      vset_map_unions2 (fun valua -> naive_p domain valua (ListP (Ast.T.Seq, ps))) first
-  | Converse p -> assert false
+  | Converse _p -> assert false
   | Kleene p ->
      let all = ref (VSet.singleton valuation) in
      let stack = Stack.create () in
      Stack.push valuation stack;
-     (*eprintf "%s\n" (Valuation.print valuation);*)
+     (*eprintf "%s %s\n" (Print.program p) (Valuation.print valuation);*)
      let treat v = if not (VSet.mem v !all) then (all := VSet.add v !all; Stack.push v stack) in
      while not (Stack.is_empty stack) do
-       (*eprintf "hello\n";*)
-       let news = naive_p domain (Stack.pop stack) p in
-       (*eprintf "%s\n" (Print.list Valuation.print (VSet.elements news));*)
+       (*eprintf "hello %s\n" (P.list Valuation.print (VSet.elements !all));*)
+       let v = Valuation.copy (Stack.pop stack) in
+       let news = naive_p domain v p in
+       (*eprintf "%s\n" (P.list Valuation.print (VSet.elements news));*)
        VSet.iter treat news
      done;
+     (*eprintf "ending %s\n" (P.list Valuation.print (VSet.elements !all));*)
      !all
 
 (*let rec run_f (domain : formula_decl list * program_decl list) valuation = function
