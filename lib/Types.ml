@@ -8,7 +8,7 @@ type poperator = Seq | U
 type roperator = Eq | Neq | Lt | Gt | Leq | Geq
 type soperator = Union | Intersect | Setminus
 
-type pure_term = Fun of (cname * pure_term list) | Int of int | Var of vname
+type pure_term = PFun of (cname * pure_term list) | PInt of int | PVar of vname
 
 type set = Set of (tuple list * vdecls) | Name of callable | List of (soperator * set * set list)
 and vdecls = vdecl list

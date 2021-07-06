@@ -40,9 +40,9 @@ struct
 
   let list_tuple f = Print.list' "(" ", " ")" f
   let rec pure_term : pure_term -> string = function
-    | Var v -> v
-    | Fun (c, ts) -> sprintf "%s%s" c (list_tuple pure_term ts)
-    | Int i -> sprintf "%d" i
+    | PVar v -> v
+    | PFun (c, ts) -> sprintf "%s%s" c (list_tuple pure_term ts)
+    | PInt i -> sprintf "%d" i
 
   let rec set = function
     | Set (t, []) -> sprintf "{ %s }" (Print.unspaces tuple t)

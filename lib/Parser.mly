@@ -53,10 +53,10 @@ bfoperator: | BIGCONJ { Ast.T.Conj } | BIGDISJ { Ast.T.Disj }
 bpoperator: | BIGSEQ { Ast.T.Seq } | BIGNONDET { Ast.T.U }
 
 pure_term:
-| name = CNAME vs = otuple_list(pure_term) { Ast.T.Fun (name, vs) }
-| vs = ttuple_list(pure_term) { Ast.T.Fun ("", vs) }
-| LPAREN RPAREN { Ast.T.Fun ("", []) }
-| v = VNAME { Ast.T.Var v }
+| name = CNAME vs = otuple_list(pure_term) { Ast.T.PFun (name, vs) }
+| vs = ttuple_list(pure_term) { Ast.T.PFun ("", vs) }
+| LPAREN RPAREN { Ast.T.PFun ("", []) }
+| v = VNAME { Ast.T.PVar v }
 
 term:
 | name = CNAME ts = otuple_list(term) { Ast.T.Fun (name, ts)  }

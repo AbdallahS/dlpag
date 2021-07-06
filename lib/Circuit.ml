@@ -69,13 +69,13 @@ let perform_sop sop s1 s2 = match sop with
   | Ast.T.Setminus -> GTermSet.diff s1 s2
 
 let rec pure_term vmapo (gterm : ground_term) (pterm : Ast.T.pure_term) : ground_term SMap.t option = match (pterm, gterm) with
-  | Ast.T.Var v, _ -> (match vmapo with | None -> None
-                                        | Some m -> match SMap.find_opt v m with | Some gt -> if gt = gterm then Some m else None
-                                                                                 | None -> Some (SMap.add v gterm m))
-  | Ast.T.Fun (c, ts), Fun (c', ts') -> if c <> c' || List.length ts <> List.length ts' then None else List.fold_left2 pure_term vmapo ts' ts
-  | Ast.T.Int i, Int j -> if i = j then vmapo else None
-  | Ast.T.Fun _, Int _
-  | Ast.T.Int _, Fun _ -> None
+  | Ast.T.PVar v, _ -> (match vmapo with | None -> None
+                                         | Some m -> match SMap.find_opt v m with | Some gt -> if gt = gterm then Some m else None
+                                                                                  | None -> Some (SMap.add v gterm m))
+  | Ast.T.PFun (c, ts), Fun (c', ts') -> if c <> c' || List.length ts <> List.length ts' then None else List.fold_left2 pure_term vmapo ts' ts
+  | Ast.T.PInt i, Int j -> if i = j then vmapo else None
+  | Ast.T.PFun _, Int _
+  | Ast.T.PInt _, Fun _ -> None
 let rec set gmap vmap : Ast.T.set -> GTermSet.t = function
   | Ast.T.Set (ts, vs) ->
      let maps = vdecls gmap vmap vs in
