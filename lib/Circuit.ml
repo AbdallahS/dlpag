@@ -63,10 +63,12 @@ let perform_rop rop v1 v2 = match rop with
   | Ast.T.Leq -> compare v1 v2 <= 0
   | Ast.T.Geq -> compare v1 v2 >= 0
 
-let perform_sop sop s1 s2 = match sop with
-  | Ast.T.Union -> GTermSet.union s1 s2
-  | Ast.T.Intersect -> GTermSet.inter s1 s2
-  | Ast.T.Setminus -> GTermSet.diff s1 s2
+let perform_sop sop = function
+  | [] -> assert false
+  | s :: ss ->
+     match sop with
+     | Ast.T.Union -> List.fold_left GTermSet.union s ss
+     | Ast.T.Intersect -> List.fold_left GTermSet.inter s ss
 
 let rec pure_term vmapo (gterm : ground_term) (pterm : Ast.T.pure_term) : ground_term SMap.t option = match (pterm, gterm) with
   | Ast.T.PVar v, _ -> (match vmapo with | None -> None
@@ -82,10 +84,18 @@ let rec set gmap vmap : Ast.T.set -> GTermSet.t = function
      let treat_tuple t : GTermSet.t = unions (List.map (fun m -> tuple gmap m t) maps) in
      unions (List.map treat_tuple ts)
  | Ast.T.Name c -> if not (CMap.mem (callable gmap vmap c) gmap) then failwith (sprintf "Set name %s unknown." (Ast.Print.callable c)); CMap.find (callable gmap vmap c) gmap
- | Ast.T.List (o, s, ss) ->
+ | Ast.T.ListS (o, s, ss) ->
+    let sets = List.map (set gmap vmap) (s :: ss) in
+    perform_sop o sets
+ | Ast.T.BigS (sop, vs, s) ->
+     let vmaps = vdecls gmap vmap vs in
+     let sets = List.map (fun m -> set gmap m s) vmaps in
+     perform_sop sop sets
+ | Ast.T.Setminus (s, ss) ->
     let s' = set gmap vmap s
     and ss' = List.map (set gmap vmap) ss in
-    List.fold_left (perform_sop o) s' ss'
+    List.fold_left GTermSet.diff s' ss'
+
 and vdecls gmap vmap : Ast.T.vdecls -> ground_term SMap.t list =
   let f vmaps vdec =
   List.concat_map (fun vmap -> vdecl gmap vmap vdec) vmaps in

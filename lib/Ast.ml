@@ -29,7 +29,6 @@ struct
   let soperator_aux = function
     | Intersect -> "intersect"
     | Union -> "union"
-    | Setminus -> "setminus"
   let eoperator o = "\\" ^ eoperator_aux o
   let foperator o = "\\" ^ foperator_aux o
   let poperator o = "\\" ^ poperator_aux o
@@ -37,6 +36,7 @@ struct
   let bigeoperator o = "\\big" ^ eoperator_aux o
   let bigfoperator o = "\\big" ^ foperator_aux o
   let bigpoperator o = "\\big" ^ poperator_aux o
+  let bigsoperator o = "\\big" ^ soperator_aux o
 
   let list_tuple f = Print.list' "(" ", " ")" f
   let rec pure_term : pure_term -> string = function
@@ -48,7 +48,9 @@ struct
     | Set (t, []) -> sprintf "{ %s }" (Print.unspaces tuple t)
     | Set (t, (_ :: _ as vs)) -> sprintf "{ %s | %s }" (Print.unspaces tuple t) (vdecls vs)
     | Name c -> callable c
-    | List (o, s, ss) -> Print.list' "" (sprintf " %s " (soperator o)) "" set (s :: ss)
+    | ListS (o, s, ss) -> Print.list' "" (sprintf " %s " (soperator o)) "" set (s :: ss)
+    | BigS (o, vs, e) -> sprintf "%s %s, %s" (bigsoperator o) (vdecls vs) (set e)
+    | Setminus (s, ss) -> Print.list' "" " \\setminus " "" set (s :: ss)
   and vdecls ds = Print.list' "" ", " "" vdecl ds
   and vdecl = function
     | FromSet (term, s) -> sprintf "%s \\in %s" (pure_term term) (set s)

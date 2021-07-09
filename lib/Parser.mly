@@ -11,6 +11,7 @@
 %token EQ NEQ LEQ GEQ
 %token BIGPLUS BIGMULT MAX MIN (*beop*)
 %token UNION INTERSECT SETMINUS (* sop *)
+%token BIGUNION BIGINTERSECT (* bsop *)
 %token GROUND FORMULA PROGRAM MAIN
 %token EOF
 
@@ -47,10 +48,11 @@ eoperator: | PLUS { Ast.T.Add } | MULT { Ast.T.Mult }
 foperator: | CONJ { Ast.T.Conj } | DISJ { Ast.T.Disj }
 poperator: | SEQ { Ast.T.Seq } | NONDET { Ast.T.U }
 roperator: | EQ { Ast.T.Eq } | NEQ { Ast.T.Neq } | LANGLE { Ast.T.Lt } | RANGLE { Ast.T.Gt } | LEQ { Ast.T.Leq } | GEQ { Ast.T.Geq }
-soperator: | UNION { Ast.T.Union } | INTERSECT { Ast.T.Intersect } | SETMINUS { Ast.T.Setminus }
+soperator: | UNION { Ast.T.Union } | INTERSECT { Ast.T.Intersect }
 beoperator: | BIGPLUS { Ast.T.Add } | BIGMULT { Ast.T.Mult } | MAX { Ast.T.Max } | MIN { Ast.T.Min }
 bfoperator: | BIGCONJ { Ast.T.Conj } | BIGDISJ { Ast.T.Disj }
 bpoperator: | BIGSEQ { Ast.T.Seq } | BIGNONDET { Ast.T.U }
+bsoperator: | BIGUNION { Ast.T.Union } | BIGINTERSECT { Ast.T.Intersect }
 
 pure_term:
 | name = CNAME vs = otuple_list(pure_term) { Ast.T.PFun (name, vs) }
@@ -67,14 +69,14 @@ term:
 
 set:
 | s = inner_set { s }
-
 outer_set:
 | LBRACE cs = separated_list(COMMA, tuple) vs = loption(MID vs = vdecls { vs }) RBRACE { Ast.T.Set (cs, vs) }
 | c = callable { Ast.T.Name c }
 | LPAREN s = inner_set RPAREN { s }
-
 inner_set:
-| l = separated_many_slist(soperator, outer_set) { Ast.T.List l }
+| l = separated_many_slist(soperator, outer_set) { Ast.T.ListS l }
+| l = separated_many_slist(SETMINUS, outer_set) { let (), hd, tl = l in Ast.T.Setminus (hd, tl) }
+| o = bsoperator vs = vdecls COLON f = inner_set { Ast.T.BigS (o, vs, f) }
 | s = outer_set { s }
 
 constraints:
@@ -94,23 +96,25 @@ tuple:
 | e1 = expr RANGE e2 = expr { Ast.T.Range (e1, e2) }
 
 cexpr:
-| l = separated_many_slist(eoperator, inner_expr) { Ast.T.ListE l }
-| l = separated_many_slist(MINUS, inner_expr) { let ((), h, r) = l in Ast.T.Subtract (h, r) }
+| l = separated_many_slist(eoperator, outer_expr) { Ast.T.ListE l }
+| l = separated_many_slist(MINUS, outer_expr) { let ((), h, r) = l in Ast.T.Subtract (h, r) }
 | o = beoperator vs = vdecls COLON f = expr { Ast.T.BigE (o, vs, f) }
-| LPAREN e = expr RPAREN { e }
+| LPAREN e = inner_expr RPAREN { e }
 | i = INT { Ast.T.Int i }
 | MINUS i = INT { Ast.T.Int (-i) }
 expr:
-| l = separated_many_slist(eoperator, inner_expr) { Ast.T.ListE l }
-| l = separated_many_slist(MINUS, inner_expr) { let ((), h, r) = l in Ast.T.Subtract (h, r) }
-| o = beoperator vs = vdecls COLON f = expr { Ast.T.BigE (o, vs, f) }
 | e = inner_expr { e }
-
-inner_expr:
-| LPAREN e = expr RPAREN { e }
+outer_expr:
 | n = VNAME { Ast.T.VarE n }
 | i = INT { Ast.T.Int i }
 | MINUS i = INT { Ast.T.Int (-i) }
+| LPAREN e = inner_expr RPAREN { e }
+
+inner_expr:
+| l = separated_many_slist(eoperator, outer_expr) { Ast.T.ListE l }
+| l = separated_many_slist(MINUS, outer_expr) { let ((), h, r) = l in Ast.T.Subtract (h, r) }
+| o = beoperator vs = vdecls COLON f = inner_expr { Ast.T.BigE (o, vs, f) }
+| e = outer_expr { e }
 
 callable:
 | n = CNAME ts = otuple_list(term) { (n, ts) }

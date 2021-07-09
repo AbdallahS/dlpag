@@ -6,11 +6,11 @@ type eoperator = Add | Mult | Max | Min
 type foperator = Conj | Disj
 type poperator = Seq | U
 type roperator = Eq | Neq | Lt | Gt | Leq | Geq
-type soperator = Union | Intersect | Setminus
+type soperator = Union | Intersect
 
 type pure_term = PFun of (cname * pure_term list) | PInt of int | PVar of vname
 
-type set = Set of (tuple list * vdecls) | Name of callable | List of (soperator * set * set list)
+type set = Set of (tuple list * vdecls) | Name of callable | ListS of (soperator * set * set list) | BigS of (soperator * vdecls * set) | Setminus of (set * set list)
 and vdecls = vdecl list
 and vdecl = FromSet of (pure_term * set) | Constraint of constraints
 and constraints = Relation of (roperator * term * term) | Notin of (term * set)
