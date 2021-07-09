@@ -36,12 +36,12 @@ separated_many_slist(Sep, Sub):
 | a = Sub s = Sep r = separated_nonempty_list(Sep, Sub) { (s, a, r) }
 
 tuple_list(X):
-| LPAREN l = separated_nonempty_list(COMMA, X) RPAREN { l }
+| LPAREN l = separated_list(COMMA, X) RPAREN { l }
 otuple_list(X):
 | { [] }
 | l = tuple_list(X) { l }
 ttuple_list(X):
-| LPAREN x = X COMMA l = separated_nonempty_list(COMMA, X) RPAREN { x :: l }
+| LPAREN x = X COMMA l = separated_list(COMMA, X) RPAREN { x :: l }
 
 doperator: | FORALL { ()  }
 eoperator: | PLUS { Ast.T.Add } | MULT { Ast.T.Mult }
