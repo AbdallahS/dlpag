@@ -83,7 +83,7 @@ let rec set gmap vmap : Ast.T.set -> GTermSet.t = function
      let maps = vdecls gmap vmap vs in
      let treat_tuple t : GTermSet.t = unions (List.map (fun m -> tuple gmap m t) maps) in
      unions (List.map treat_tuple ts)
- | Ast.T.Name c -> if not (CMap.mem (callable gmap vmap c) gmap) then failwith (sprintf "Set name %s unknown." (Ast.Print.callable c)); CMap.find (callable gmap vmap c) gmap
+ | Ast.T.CallS c -> if not (CMap.mem (callable gmap vmap c) gmap) then failwith (sprintf "Set name %s unknown." (Ast.Print.callable c)); CMap.find (callable gmap vmap c) gmap
  | Ast.T.ListS (o, s, ss) ->
     let sets = List.map (set gmap vmap) (s :: ss) in
     perform_sop o sets

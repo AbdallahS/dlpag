@@ -71,7 +71,7 @@ set:
 | s = inner_set { s }
 outer_set:
 | LBRACE cs = separated_list(COMMA, tuple) vs = loption(MID vs = vdecls { vs }) RBRACE { Ast.T.Set (cs, vs) }
-| c = callable { Ast.T.Name c }
+| c = callable { Ast.T.CallS c }
 | LPAREN s = inner_set RPAREN { s }
 inner_set:
 | l = separated_many_slist(soperator, outer_set) { Ast.T.ListS l }

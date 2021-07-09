@@ -47,7 +47,7 @@ struct
   let rec set = function
     | Set (t, []) -> sprintf "{ %s }" (Print.unspaces tuple t)
     | Set (t, (_ :: _ as vs)) -> sprintf "{ %s | %s }" (Print.unspaces tuple t) (vdecls vs)
-    | Name c -> callable c
+    | CallS c -> callable c
     | ListS (o, s, ss) -> Print.list' "" (sprintf " %s " (soperator o)) "" set (s :: ss)
     | BigS (o, vs, e) -> sprintf "%s %s, %s" (bigsoperator o) (vdecls vs) (set e)
     | Setminus (s, ss) -> Print.list' "" " \\setminus " "" set (s :: ss)
