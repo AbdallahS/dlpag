@@ -38,7 +38,7 @@ and token = parse
   | '<' { P.LANGLE } | '>' { P.RANGLE }
   | "<=" { P.LEQ } | ">=" { P.GEQ }
   | ".." { P.RANGE }
-  | '+' { P.PLUS } | '-' { P.MINUS } | "*" { P.MULT }
+  | '+' { P.PLUS } | '-' { P.MINUS } | "*" { P.MULT } | "**" { P.POW }
   | "\\sum" { P.BIGPLUS } | "\\mult" { P.BIGMULT } | "\\max" { P.MAX } | "\\min" { P.MIN }
   | "\\neg" { P.NEG }
   | "<-" { P.ASSIGN } | "?" { P.TEST }  | "^" { P.CONVERSE } | "\\star" { P.STAR }

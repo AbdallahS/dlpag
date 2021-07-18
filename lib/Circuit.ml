@@ -49,11 +49,19 @@ let subtract_strings i1 is =
   let i2 = Misc.sum is in
   (i1 - i2)
 
+let rec pow a = function
+  | 0 -> 1
+  | 1 -> a
+  | n ->
+    let b = pow a (n / 2) in
+    b * b * (if n mod 2 = 0 then 1 else a)
+
 let perform_eop eop is = match eop with
   | Ast.T.Add -> Misc.sum is
   | Ast.T.Mult -> Misc.product is
   | Ast.T.Max -> List.fold_left max min_int is
   | Ast.T.Min -> List.fold_left min max_int is
+  | Ast.T.Pow -> List.fold_left pow 1 is
 
 let perform_rop rop v1 v2 = match rop with
   | Ast.T.Eq -> compare v1 v2 = 0

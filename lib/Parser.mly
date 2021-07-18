@@ -7,7 +7,7 @@
 %token ASSIGN TEST SEQ NONDET CONVERSE STAR
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
 %token DEFINE COLON COMMA DOT RANGE MID WHERE
-%token PLUS MULT MINUS (*eop*)
+%token PLUS MULT POW MINUS (*eop*)
 %token EQ NEQ LEQ GEQ
 %token BIGPLUS BIGMULT MAX MIN (*beop*)
 %token UNION INTERSECT SETMINUS (* sop *)
@@ -44,7 +44,7 @@ ttuple_list(X):
 | LANGLE l = separated_list(COMMA, X) RANGLE { l }
 
 doperator: | FORALL { ()  }
-eoperator: | PLUS { Ast.T.Add } | MULT { Ast.T.Mult }
+eoperator: | PLUS { Ast.T.Add } | MULT { Ast.T.Mult } | POW { Ast.T.Pow }
 foperator: | CONJ { Ast.T.Conj } | DISJ { Ast.T.Disj }
 poperator: | SEQ { Ast.T.Seq } | NONDET { Ast.T.U }
 roperator: | EQ { Ast.T.Eq } | NEQ { Ast.T.Neq } | LANGLE { Ast.T.Lt } | RANGLE { Ast.T.Gt } | LEQ { Ast.T.Leq } | GEQ { Ast.T.Geq }

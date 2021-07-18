@@ -13,6 +13,7 @@ struct
     | Mult -> "*"
     | Max -> "\\max"
     | Min -> "\\min"
+    | Pow -> "**"
   let foperator_aux = function
     | Conj -> "and"
     | Disj -> "or"

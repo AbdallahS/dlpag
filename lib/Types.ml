@@ -2,7 +2,7 @@ module AST = struct module T = struct
 type cname = string
 type vname = string
 
-type eoperator = Add | Mult | Max | Min
+type eoperator = Add | Mult | Max | Min | Pow
 type foperator = Conj | Disj
 type poperator = Seq | U
 type roperator = Eq | Neq | Lt | Gt | Leq | Geq
