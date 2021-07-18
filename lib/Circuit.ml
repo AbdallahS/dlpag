@@ -91,7 +91,11 @@ let rec set gmap vmap : Ast.T.set -> GTermSet.t = function
      let maps = vdecls gmap vmap vs in
      let treat_element e : GTermSet.t = unions (List.map (fun m -> element gmap m e) maps) in
      unions (List.map treat_element ts)
- | Ast.T.CallS c -> if not (CMap.mem (callable gmap vmap c) gmap) then failwith (sprintf "Set name %s unknown." (Ast.Print.callable c)); CMap.find (callable gmap vmap c) gmap
+ | Ast.T.CallS c ->
+    let c' = callable gmap vmap c in
+    (match CMap.find_opt c' gmap with
+    | None -> failwith (sprintf "Set name %s ground as %s unknown." (Ast.Print.callable c) (Print.callable c'))
+    | Some g -> g)
  | Ast.T.ListS (o, s, ss) ->
     let sets = List.map (set gmap vmap) (s :: ss) in
     perform_sop o sets
