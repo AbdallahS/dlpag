@@ -10,14 +10,14 @@ type soperator = Union | Intersect
 
 type pure_term = PFun of (cname * pure_term list) | PInt of int | PVar of vname
 
-type set = Set of (tuple list * vdecls) | CallS of callable | ListS of (soperator * set * set list) | BigS of (soperator * vdecls * set) | Setminus of (set * set list)
+type set = Set of (element list * vdecls) | CallS of callable | ListS of (soperator * set * set list) | BigS of (soperator * vdecls * set) | Setminus of (set * set list)
 and vdecls = vdecl list
 and vdecl = FromSet of (pure_term * set) | Constraint of constraints
-and constraints = Relation of (roperator * term * term) | Notin of (term * set)
+and constraints = In of (term * set) | Notin of (term * set) | Relation of (roperator * term * term)
 and term = Exp of expr | Fun of (cname * term list) | Var of vname
-and tuple = Term of term | Range of (expr * expr)
+and element = Tuple of term | Range of (expr * expr)
 and expr = VarE of vname | Int of int | ListE of (eoperator * expr * expr list) | BigE of (eoperator * vdecls * expr) | Subtract of (expr * expr list)
-and callable = cname * term list
+and callable = Call of (cname * term list) | VarC of vname
 
 type formula = CallF of callable | Top | Neg of formula | ListF of (foperator * formula * formula list) | BigF of (foperator * vdecls * formula) | Diamond of (program * formula)
 and program  = CallP of callable | Assign of (callable * formula) | Test of formula | ListP of (poperator * program * program list) | BigP of (poperator * vdecls * program) | Converse of program | Kleene of program

@@ -41,7 +41,7 @@ otuple_list(X):
 | { [] }
 | l = tuple_list(X) { l }
 ttuple_list(X):
-| LPAREN x = X COMMA l = separated_list(COMMA, X) RPAREN { x :: l }
+| LANGLE l = separated_list(COMMA, X) RANGLE { l }
 
 doperator: | FORALL { ()  }
 eoperator: | PLUS { Ast.T.Add } | MULT { Ast.T.Mult }
@@ -55,22 +55,24 @@ bpoperator: | BIGSEQ { Ast.T.Seq } | BIGNONDET { Ast.T.U }
 bsoperator: | BIGUNION { Ast.T.Union } | BIGINTERSECT { Ast.T.Intersect }
 
 pure_term:
-| name = CNAME vs = otuple_list(pure_term) { Ast.T.PFun (name, vs) }
-| vs = ttuple_list(pure_term) { Ast.T.PFun ("", vs) }
-| LPAREN RPAREN { Ast.T.PFun ("", []) }
+| vs = ttuple_list(inner_pure_term) { Ast.T.PFun ("", vs) }
+| t = inner_pure_term { t }
+inner_pure_term:
+| name = CNAME vs = otuple_list(inner_pure_term) { Ast.T.PFun (name, vs) }
 | v = VNAME { Ast.T.PVar v }
 
 term:
-| name = CNAME ts = otuple_list(term) { Ast.T.Fun (name, ts)  }
-| ts = ttuple_list(term) { Ast.T.Fun ("", ts)  }
-| LPAREN RPAREN { Ast.T.Fun ("", []) }
+| ts = ttuple_list(inner_term) { Ast.T.Fun ("", ts)  }
+| t = inner_term { t }
+inner_term:
+| name = CNAME ts = otuple_list(inner_term) { Ast.T.Fun (name, ts)  }
 | v = VNAME { Ast.T.Var v }
 | e = cexpr { Ast.T.Exp e }
 
 set:
 | s = inner_set { s }
 outer_set:
-| LBRACE cs = separated_list(COMMA, tuple) vs = loption(MID vs = vdecls { vs }) RBRACE { Ast.T.Set (cs, vs) }
+| LBRACE cs = separated_list(COMMA, element) vs = loption(MID vs = vdecls { vs }) RBRACE { Ast.T.Set (cs, vs) }
 | c = callable { Ast.T.CallS c }
 | LPAREN s = inner_set RPAREN { s }
 inner_set:
@@ -81,8 +83,9 @@ inner_set:
 
 constraints:
 | LPAREN c = constraints RPAREN { c }
-| t1 = term r = roperator t2 = term { Ast.T.Relation (r, t1, t2) }
+| t = term IN s = set { Ast.T.In (t, s)}
 | t = term NOTIN s = set { Ast.T.Notin (t, s)}
+| t1 = term r = roperator t2 = term { Ast.T.Relation (r, t1, t2) }
 
 vdecl:
 | vs = pure_term IN s = set { Ast.T.FromSet (vs, s) }
@@ -91,15 +94,14 @@ vdecl:
 vdecls:
 | l = separated_nonempty_list(COMMA, vdecl) { l }
 
-tuple:
-| t = term { Ast.T.Term t  }
+element:
+| t = term { Ast.T.Tuple t  }
 | e1 = expr RANGE e2 = expr { Ast.T.Range (e1, e2) }
 
 cexpr:
 | l = separated_many_slist(eoperator, outer_expr) { Ast.T.ListE l }
 | l = separated_many_slist(MINUS, outer_expr) { let ((), h, r) = l in Ast.T.Subtract (h, r) }
-| o = beoperator vs = vdecls COLON f = expr { Ast.T.BigE (o, vs, f) }
-| LPAREN e = inner_expr RPAREN { e }
+| o = beoperator vs = vdecls COLON f = inner_expr { Ast.T.BigE (o, vs, f) }
 | i = INT { Ast.T.Int i }
 | MINUS i = INT { Ast.T.Int (-i) }
 expr:
@@ -109,7 +111,6 @@ outer_expr:
 | i = INT { Ast.T.Int i }
 | MINUS i = INT { Ast.T.Int (-i) }
 | LPAREN e = inner_expr RPAREN { e }
-
 inner_expr:
 | l = separated_many_slist(eoperator, outer_expr) { Ast.T.ListE l }
 | l = separated_many_slist(MINUS, outer_expr) { let ((), h, r) = l in Ast.T.Subtract (h, r) }
@@ -117,7 +118,8 @@ inner_expr:
 | e = outer_expr { e }
 
 callable:
-| n = CNAME ts = otuple_list(term) { (n, ts) }
+| n = CNAME ts = otuple_list(term) { Ast.T.Call (n, ts) }
+| n = VNAME { Ast.T.VarC n }
 
 decl(A):
 | vs = loption(doperator vs = vdecls COLON { vs }) c = callable DEFINE a = A DOT { (vs, c, a) }

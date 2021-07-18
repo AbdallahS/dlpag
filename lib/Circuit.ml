@@ -81,8 +81,8 @@ let rec pure_term vmapo (gterm : ground_term) (pterm : Ast.T.pure_term) : ground
 let rec set gmap vmap : Ast.T.set -> GTermSet.t = function
   | Ast.T.Set (ts, vs) ->
      let maps = vdecls gmap vmap vs in
-     let treat_tuple t : GTermSet.t = unions (List.map (fun m -> tuple gmap m t) maps) in
-     unions (List.map treat_tuple ts)
+     let treat_element e : GTermSet.t = unions (List.map (fun m -> element gmap m e) maps) in
+     unions (List.map treat_element ts)
  | Ast.T.CallS c -> if not (CMap.mem (callable gmap vmap c) gmap) then failwith (sprintf "Set name %s unknown." (Ast.Print.callable c)); CMap.find (callable gmap vmap c) gmap
  | Ast.T.ListS (o, s, ss) ->
     let sets = List.map (set gmap vmap) (s :: ss) in
@@ -109,17 +109,21 @@ and vdecl gmap vmap = function
   | Ast.T.Constraint c -> let sat = constraints gmap vmap c in
                           if sat then [vmap] else []
 and constraints gmap vmap = function
+  | Ast.T.In (t, s) ->
+     let tuples = set gmap vmap s in
+     let t = term gmap vmap t in
+     GTermSet.mem t tuples
+  | Ast.T.Notin (t, s) ->
+     let tuples = set gmap vmap s in
+     let t = term gmap vmap t in
+     not (GTermSet.mem t tuples)
   | Ast.T.Relation (r, t1, t2) ->
      let t1 = term gmap vmap t1
      and t2 = term gmap vmap t2 in
      perform_rop r t1 t2
-  | Ast.T.Notin (t, s) ->
-     let tuples = set gmap vmap s in
-     let t = term gmap vmap t in
-     GTermSet.mem t tuples
 
-and tuple gmap vmap : Ast.T.tuple -> GTermSet.t  = function
-  | Ast.T.Term t -> GTermSet.singleton (term gmap vmap t)
+and element gmap vmap : Ast.T.element -> GTermSet.t  = function
+  | Ast.T.Tuple t -> GTermSet.singleton (term gmap vmap t)
   | Ast.T.Range (e1, e2) ->
      let i1, i2 = expr gmap vmap e1, expr gmap vmap e2 in
      let l = List.map (fun i -> Int i) (Misc.range i1 (i2+1)) in
@@ -142,7 +146,13 @@ and expr gmap vmap : Ast.T.expr -> int = function
   | Int i -> i
   | Fun _ as g -> failwith (sprintf "Expression %s ground to a non-int %s" (Ast.Print.expr e) (Print.ground_term g))*)
 
-and callable gmap vmap (name, es) = (name, List.map (term gmap vmap) es)
+and callable gmap vmap = function
+  | Ast.T.Call (name, es) -> (name, List.map (term gmap vmap) es)
+  | Ast.T.VarC n ->
+     match SMap.find_opt n vmap with
+     | None -> failwith (sprintf "variable %s unbound\n" n)
+     | Some (Int i) -> failwith (sprintf "variable %s is bound to int %d" n i)
+     | Some (Fun c) -> c
 
 let rec formula gmap vmap : Ast.T.formula -> T.formula = function
   | Ast.T.CallF c -> CallF (callable gmap vmap c)

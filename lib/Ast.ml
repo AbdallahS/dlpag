@@ -45,8 +45,8 @@ struct
     | PInt i -> sprintf "%d" i
 
   let rec set = function
-    | Set (t, []) -> sprintf "{ %s }" (Print.list' "" ", " "" tuple t)
-    | Set (t, (_ :: _ as vs)) -> sprintf "{ %s | %s }" (Print.list' "" ", " "" tuple t) (vdecls vs)
+    | Set (t, []) -> sprintf "{ %s }" (Print.list' "" ", " "" element t)
+    | Set (t, (_ :: _ as vs)) -> sprintf "{ %s | %s }" (Print.list' "" ", " "" element t) (vdecls vs)
     | CallS c -> callable c
     | ListS (o, s, ss) -> Print.list' "" (sprintf " %s " (soperator o)) "" set (s :: ss)
     | BigS (o, vs, e) -> sprintf "%s %s, %s" (bigsoperator o) (vdecls vs) (set e)
@@ -56,10 +56,11 @@ struct
     | FromSet (term, s) -> sprintf "%s \\in %s" (pure_term term) (set s)
     | Constraint c -> constraints c
   and constraints = function
+    | In (t, s) -> sprintf "%s \\in %s" (term t) (set s)
+    | Notin (t, s) -> sprintf "%s \\notin %s" (term t) (set s)
     | Relation (r, t1, t2) -> sprintf "%s %s %s" (term t1) (roperator r) (term t2)
-    | Notin (t, s) -> sprintf "%s \notin %s" (term t) (set s)
-  and tuple = function
-    | Term t -> term t
+  and element = function
+    | Tuple t -> term t
     | Range (e1, e2) -> sprintf "%s..%s" (expr e1) (expr e2)
   and term : term -> string = function
     | Fun (c, ts) -> sprintf "%s%s" c (list_tuple term ts)
@@ -74,9 +75,10 @@ struct
     | VarE n -> n
     | Int i -> Print.int i
     | ListE _ | BigE _ | Subtract _ as e -> sprintf "(%s)" (expr e)
-  and callable (n, ts) = match ts with
-    | [] -> cname n
-    | _ :: _ -> sprintf "%s(%s)" n (Print.list' "" ", " "" term ts)
+  and callable = function 
+    | Call (n, []) -> cname n
+    | Call (n, (_ :: _ as ts)) -> sprintf "%s(%s)" n (Print.list' "" ", " "" term ts)
+    | VarC n -> n
 
   let rec formula = function
     | Top | CallF _ | Neg _ | Diamond _ as f -> inner_formula f
