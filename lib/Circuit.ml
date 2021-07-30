@@ -31,7 +31,7 @@ struct
   and inner_program = function
     | CallP a -> callable a
     | Assign (a, f) -> sprintf "%s <- %s" (callable a) (formula f)
-    | Test f -> sprintf "%s?" (formula f)
+    | Test f -> sprintf "?%s?" (formula f)
     | Converse p -> sprintf "%s^" (program p)
     | Kleene p -> sprintf "%s\\star" (program p)
     | ListP _ as p -> sprintf "(%s)" (program p)
