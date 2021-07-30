@@ -100,7 +100,7 @@ struct
     | Assign (a, f) -> sprintf "%s <- %s" (callable a) (formula f)
     | Test f -> sprintf "%s?" (formula f)
     | Converse p -> sprintf "%s^" (program p)
-    | Kleene p -> sprintf "%s*" (program p)
+    | Kleene p -> sprintf "%s\\star" (program p)
     | ListP _ | BigP _ as p -> sprintf "(%s)" (program p)
 
   let forall_decls vs = match vs with

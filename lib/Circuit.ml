@@ -33,7 +33,7 @@ struct
     | Assign (a, f) -> sprintf "%s <- %s" (callable a) (formula f)
     | Test f -> sprintf "%s?" (formula f)
     | Converse p -> sprintf "%s^" (program p)
-    | Kleene p -> sprintf "%s*" (program p)
+    | Kleene p -> sprintf "%s\\star" (program p)
     | ListP _ as p -> sprintf "(%s)" (program p)
   let formula_decl (c, f) = sprintf "%s := %s." (callable c) (formula f)
   let program_decl (c, p) = sprintf "%s := %s." (callable c) (program p)
