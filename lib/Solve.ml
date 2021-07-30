@@ -1,8 +1,8 @@
 open Printf
 
 type callable = int
-type formula = CallF of callable | Atom of callable | Neg of formula | ListF of (Ast.T.foperator * formula list) | Diamond of (program * formula)
-and program  = CallP of callable | Assign of (callable * formula) | Test of formula | ListP of (Ast.T.poperator * program list) | Converse of program | Kleene of program
+type formula = CallF of callable | Atom of callable | Neg of formula | ListF of (Ast.T.foperator * formula * formula list) | Diamond of (program * formula) | Top
+and program  = CallP of callable | Assign of (callable * formula) | Test of formula | ListP of (Ast.T.poperator * program * program list) | Converse of program | Kleene of program
 
 type 'a decl = callable * 'a
 type file = formula decl list * program decl list * callable
@@ -14,46 +14,47 @@ module P = Print
 module Print =
 struct
   let rec formula = function
+    | Top -> "T"
     | CallF i -> sprintf "F%d" i
     | Atom i -> sprintf "A%d" i
     | Neg f -> sprintf "-%s" (formula f)
-    | ListF (o, fs) -> sprintf "(%s %s)" (Ast.Print.foperator o) (P.list formula fs)
+    | ListF (o, f, fs) -> sprintf "(%s %s)" (Ast.Print.foperator o) (P.list formula (f :: fs))
     | Diamond (p, f) -> sprintf "<%s>%s" (program p) (formula f)
   and program = function
     | CallP i -> sprintf "P%d" i
     | Assign (i, f) -> sprintf "A%d <- %s" i (formula f)
     | Test f -> sprintf "?%s?" (formula f)
-    | ListP (o, ps) -> sprintf "(%s %s)" (Ast.Print.poperator o) (P.list program ps)
-    | Converse p -> assert false
-    | Kleene p -> sprintf "%s\star" (program p)
+    | ListP (o, p, ps) -> sprintf "(%s %s)" (Ast.Print.poperator o) (P.list program (p :: ps))
+    | Converse _p -> assert false
+    | Kleene p -> sprintf "%s\\star" (program p)
 end
 
 let rec formula (mapa, mapf, mapp) = function
   | Circuit.T.CallF c -> if CMap.mem c mapf then CallF (CMap.find c mapf) else (assert (CMap.mem c mapa); Atom (CMap.find c mapa))
-  | Top -> ListF (Ast.T.Conj, [])
+  | Top -> Top
   | Neg f -> Neg (formula (mapa, mapf, mapp) f)
-  | ListF (o, fs) -> ListF (o, List.map (formula (mapa, mapf, mapp)) fs)
+  | ListF (o, f, fs) -> ListF (o, formula (mapa, mapf, mapp) f, List.map (formula (mapa, mapf, mapp)) fs)
   | Diamond (p, f) -> Diamond (program (mapa, mapf, mapp) p, formula (mapa, mapf, mapp) f)
 and program (mapa, mapf, mapp) = function
   | Circuit.T.CallP c -> assert (CMap.mem c mapp); CallP (CMap.find c mapp)
   | Assign (c, f) -> assert (CMap.mem c mapa); Assign (CMap.find c mapa, formula (mapa, mapf, mapp) f)
   | Test f -> Test (formula (mapa, mapf, mapp) f)
-  | ListP (o, ps) -> ListP (o, List.map (program (mapa, mapf, mapp)) ps)
+  | ListP (o, p, ps) -> ListP (o, program (mapa, mapf, mapp) p, List.map (program (mapa, mapf, mapp)) ps)
   | Converse p -> Converse (program (mapa, mapf, mapp) p)
   | Kleene p -> Kleene (program (mapa, mapf, mapp) p)
 
-let extract_names decls (fdecs, pdecs, call) =
+let extract_names decls (fdecs, pdecs, _call) =
   let rec aux_f (seta, setf, setp) = function
     | Circuit.T.CallF c -> if List.mem c decls then (seta, CSet.add c setf, setp) else (CSet.add c seta, setf, setp)
     | Top -> (seta, setf, setp)
     | Neg f -> aux_f (seta, setf, setp) f
-    | ListF (_, fs) -> List.fold_left aux_f (seta, setf, setp) fs
+    | ListF (_, f, fs) -> List.fold_left aux_f (seta, setf, setp) (f :: fs)
     | Diamond (p, f) -> aux_f (aux_p (seta, setf, setp) p) f
   and aux_p (seta, setf, setp) = function
     | Circuit.T.CallP c -> (seta, setf, CSet.add c setp)
     | Assign (a, f) -> aux_f (CSet.add a seta, setf, setp) f
     | Test f -> aux_f (seta, setf, setp) f
-    | ListP (_, ps) -> List.fold_left aux_p (seta, setf, setp) ps
+    | ListP (_, p, ps) -> List.fold_left aux_p (seta, setf, setp) (p :: ps)
     | Converse p | Kleene p -> aux_p (seta, setf, setp) p in
   let (seta, setf, setp) = List.fold_left aux_f (CSet.empty, CSet.empty, CSet.empty) fdecs in
   let (seta, setf, setp) = List.fold_left aux_p (seta, setf, setp) pdecs in
@@ -105,21 +106,22 @@ let vset_map_unions f l = List.fold_left (fun accu elt -> VSet.union accu (f elt
 let vset_map_unions2 f l = VSet.fold (fun elt accu -> VSet.union accu (f elt)) l VSet.empty
 
 let rec naive_f domain valuation = function
+  | Top -> true
   | CallF c -> let (fs, _) = domain in assert (c < Array.length fs); naive_f domain valuation fs.(c)
   | Atom a -> Valuation.test_atom valuation a
   | Neg f -> not (naive_f domain valuation f)
-  | ListF (Ast.T.Conj, fs) -> List.for_all (naive_f domain valuation) fs
-  | ListF (Ast.T.Disj, fs) -> List.exists (naive_f domain valuation) fs
+  | ListF (Ast.T.Conj, f, fs) -> List.for_all (naive_f domain valuation) (f :: fs)
+  | ListF (Ast.T.Disj, f, fs) -> List.exists (naive_f domain valuation) (f :: fs)
   | Diamond (p, f) -> VSet.exists (fun v -> naive_f domain v f) (naive_p domain (Array.copy valuation) p)
 and naive_p domain valuation = function
   | CallP c -> let (_, ps) = domain in assert (c < Array.length ps); naive_p domain valuation ps.(c)
   | Assign (c, f) -> assert (c < Array.length valuation); valuation.(c) <- naive_f domain valuation f; VSet.singleton valuation
   | Test f -> if naive_f domain (Valuation.copy valuation) f then VSet.singleton valuation else VSet.empty
-  | ListP (Ast.T.U, ps) -> let map p = naive_p domain (Valuation.copy valuation) p in vset_map_unions map ps
-  | ListP (Ast.T.Seq, []) -> VSet.singleton valuation
-  | ListP (Ast.T.Seq, p :: ps) ->
+  | ListP (Ast.T.U, hd, ps) -> let map p = naive_p domain (Valuation.copy valuation) p in vset_map_unions map (hd :: ps)
+  | ListP (Ast.T.Seq, p, []) -> naive_p domain valuation p
+  | ListP (Ast.T.Seq, p, p1 :: ps) ->
      let first = naive_p domain valuation p in
-     vset_map_unions2 (fun valua -> naive_p domain valua (ListP (Ast.T.Seq, ps))) first
+     vset_map_unions2 (fun valua -> naive_p domain valua (ListP (Ast.T.Seq, p1, ps))) first
   | Converse _p -> assert false
   | Kleene p ->
      let all = ref (VSet.singleton valuation) in

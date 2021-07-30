@@ -76,7 +76,7 @@ struct
     | VarE n -> n
     | Int i -> Print.int i
     | ListE _ | BigE _ | Subtract _ as e -> sprintf "(%s)" (expr e)
-  and callable = function 
+  and callable = function
     | Call (n, []) -> cname n
     | Call (n, (_ :: _ as ts)) -> sprintf "%s(%s)" n (Print.list' "" ", " "" term ts)
     | VarC n -> n

@@ -29,8 +29,8 @@ end end
 module CIRCUIT = struct module T = struct
 type ground_term = Fun of (AST.T.cname * ground_term list) | Int of int
 type callable = AST.T.cname * ground_term list
-type formula = CallF of callable | Top | Neg of formula | ListF of (AST.T.foperator * formula list) | Diamond of program * formula
-and program  = CallP of callable | Assign of (callable * formula) | Test of formula | ListP of (AST.T.poperator * program list) | Converse of program | Kleene of program
+type formula = CallF of callable | Top | Neg of formula | ListF of (AST.T.foperator * formula * formula list) | Diamond of (program * formula)
+and program  = CallP of callable | Assign of (callable * formula) | Test of formula | ListP of (AST.T.poperator * program * program list) | Converse of program | Kleene of program
 
 type 'a decl = callable * 'a
 type file = formula decl list * program decl list * callable

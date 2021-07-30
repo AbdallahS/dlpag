@@ -42,12 +42,12 @@ let rec extract_dependencies_f = function
   | Circuit.T.CallF c -> [c]
   | Top -> []
   | Neg f -> extract_dependencies_f f
-  | ListF (_, fs) -> List.concat_map extract_dependencies_f fs
+  | ListF (_, f, fs) -> List.concat_map extract_dependencies_f (f :: fs)
   | Diamond (p, f) -> (extract_dependencies_f f) @(extract_dependencies_p p)
 and extract_dependencies_p = function
   | Circuit.T.CallP c -> [c]
   | Assign (_, f) | Test f -> extract_dependencies_f f
-  | ListP (_, ps) -> List.concat_map extract_dependencies_p ps
+  | ListP (_, p, ps) -> List.concat_map extract_dependencies_p (p :: ps)
   | Converse p | Kleene p -> extract_dependencies_p p
 
 let error_f name = eprintf "warning: function %s defined multiple times\n" (Circuit.Print.callable name)
@@ -91,7 +91,7 @@ let rec substitute_f polarity (names_map : formula CMap.t * program CMap.t) = fu
   | Circuit.T.CallF c -> find_f polarity names_map c
   | Top -> Base polarity
   | Neg f -> substitute_f (not polarity) names_map f
-  | ListF (op, fs) -> ListF (operator polarity op, List.map (substitute_f polarity names_map) fs)
+  | ListF (op, f, fs) -> ListF (operator polarity op, List.map (substitute_f polarity names_map) (f :: fs))
   | Diamond (p, f) -> Modal (polarity, substitute_p names_map p, substitute_f polarity names_map f)
 and substitute_p names_map = function
   | Circuit.T.CallP c -> find_p names_map c
@@ -99,7 +99,7 @@ and substitute_p names_map = function
      if CMap.mem c (fst names_map) || CMap.mem c (snd names_map) then eprintf "type error: trying to assign to %s which isn't an atomic proposition\n" (Circuit.Print.callable c);
      Assign (c, substitute_f true names_map f)
   | Test f -> Test (substitute_f true names_map f)
-  | ListP (op, ps) -> ListP (op, List.map (substitute_p names_map) ps)
+  | ListP (op, p, ps) -> ListP (op, List.map (substitute_p names_map) (p :: ps))
   | Converse p -> Converse (substitute_p names_map p)
   | Kleene p -> Kleene (substitute_p names_map p)
 
