@@ -38,6 +38,12 @@ struct
   let bigfoperator o = "\\big" ^ foperator_aux o
   let bigpoperator o = "\\big" ^ poperator_aux o
   let bigsoperator o = "\\big" ^ soperator_aux o
+  let coperator = function
+    | Top -> "\\top"
+    | Bot -> "\\bot"
+  let moperator o p f = match o with
+    | Box     -> sprintf "[%s]%s" p f
+    | Diamond -> sprintf "<%s>%s" p f
 
   let list_tuple f = Print.list' "(" ", " ")" f
   let rec pure_term : pure_term -> string = function
@@ -82,14 +88,14 @@ struct
     | VarC n -> n
 
   let rec formula = function
-    | Top | CallF _ | Neg _ | Diamond _ as f -> inner_formula f
+    | Const _ | CallF _ | Neg _ | Modal _ as f -> inner_formula f
     | ListF (a, f, fs) -> Print.list' "" (sprintf " %s " (foperator a)) "" inner_formula (f :: fs)
     | BigF (a, vs, f) -> sprintf "%s %s: %s" (bigfoperator a) (vdecls vs) (formula f)
   and inner_formula = function
-    | Top -> "\\top"
+    | Const o -> coperator o
     | CallF a -> callable a
     | Neg f -> sprintf "\\neg %s" (inner_formula f)
-    | Diamond (p, f) -> sprintf "<%s>%s" (program p) (inner_formula f)
+    | Modal (m, p, f) -> moperator m (program p) (inner_formula f)
     | ListF _ | BigF _  as f -> sprintf "(%s)" (formula f)
   and program = function
     | ListP (a, p, ps) -> Print.list' "" (sprintf " %s " (poperator a)) "" inner_program (p :: ps)
@@ -98,7 +104,7 @@ struct
   and inner_program = function
     | CallP a -> callable a
     | Assign (a, f) -> sprintf "%s <- %s" (callable a) (formula f)
-    | Test f -> sprintf "%s?" (formula f)
+    | Test f -> sprintf "?%s?" (formula f)
     | Converse p -> sprintf "%s^" (program p)
     | Kleene p -> sprintf "%s\\star" (program p)
     | ListP _ | BigP _ as p -> sprintf "(%s)" (program p)

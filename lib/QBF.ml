@@ -50,26 +50,26 @@ let make_equiv context vx vy =
   List.map aux context.vars
 
 let rec reduction_f context vx = function
-  | Formula.CallF (polarity, name) -> Atom (polarity, (name, vx))
-  | Base true -> ListQ (Ast.T.Conj, [])
-  | Base false -> ListQ (Ast.T.Disj, [])
+  | Formula.T.CallF (polarity, name) -> Atom (polarity, (name, vx))
+  | Const Ast.T.Top -> ListQ (Ast.T.Conj, [])
+  | Const Ast.T.Bot -> ListQ (Ast.T.Disj, [])
   | ListF (op, fs) -> ListQ (op, List.map (reduction_f context vx) fs)
-  | Modal (true, p, f) ->
+  | Modal (Ast.T.Diamond, p, f) ->
      let vary, vy = new_valuation context in
      Quantifier (QCIR.Exists, vary, conj2 (reduction_g context vx vy p) (reduction_f context vy f))
-  | Modal (false, p, f) ->
+  | Modal (Ast.T.Box, p, f) ->
      let vary, vy = new_valuation context in
      let prog = reduction_g context vx vy p
      and form = reduction_f context vy f in
      Quantifier (QCIR.Forall, vary, Ite (prog, form, bottom))
 
 and reduction_g context vx vy = function
-  | Formula.Assign (name, f) -> assign context vx vy name (reduction_f context vx f)
+  | Formula.T.Assign (name, f) -> assign context vx vy name (reduction_f context vx f)
   | Test f -> ListQ (Ast.T.Conj, reduction_f context vx f :: make_equiv context vx vy)
   | ListP (Ast.T.U, ps) -> ListQ (Ast.T.Disj, List.map (reduction_g context vx vy) ps)
   | ListP (Ast.T.Seq, ps) -> reduction_i context vx vy ps
   | Converse p -> reduction_g context vy vx p
-  | Kleene p -> reduction_h context context.n vx vy (Formula.ListP (U, [Formula.Test (Formula.Base true); p]))
+  | Kleene p -> reduction_h context context.n vx vy (Formula.T.ListP (U, [Formula.T.Test (Formula.T.Const Ast.T.Top); p]))
 
 and reduction_h context m vx vy p =
   if m <= 0 then ListQ (Ast.T.Disj, reduction_g context vx vy p :: make_equiv context vx vy)

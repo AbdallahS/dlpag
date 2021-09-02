@@ -1,34 +1,31 @@
 open Printf
 
+include Types.FORMULA
+open T
+
 module CMap = Map.Make (struct type t = Circuit.T.callable let compare = compare end)
 module CSet = Set.Make (struct type t = Circuit.T.callable let compare = compare end)
 
-type formula = CallF of (bool * Circuit.T.callable) | Base of bool | ListF of (Ast.T.foperator * formula list) | Modal of (bool * program * formula)
-(*type formula = CallF of Circuit.callable | Top | Neg of formula | ListF of (Ast.foperator * formula list) | Diamond of (program * formula)*)
-and program  = Assign of (Circuit.T.callable * formula) | Test of formula | ListP of (Ast.T.poperator * program list) | Converse of program | Kleene of program
-
-module UPrint = Print
+module P = Print
 module Print =
 struct
   let rec formula = function
     | ListF (a, fs) -> Print.list' "" (sprintf " %s " (Ast.Print.foperator a)) "" inner_formula fs
-    | CallF _ | Base _ | Modal _ as f -> inner_formula f
+    | CallF _ | Const _ | Modal _ as f -> inner_formula f
   and inner_formula = function
     | CallF (true, a) -> Circuit.Print.callable a
     | CallF (false, a) -> sprintf "\\neg %s" (Circuit.Print.callable a)
-    | Base true -> "\\top"
-    | Base false -> "\\bot"
-    | Modal (true, p, f) -> sprintf "<%s>%s" (program p) (inner_formula f)
-    | Modal (false, p, f) -> sprintf "[%s]%s" (program p) (inner_formula f)
+    | Const o -> Ast.Print.coperator o
+    | Modal (o, p, f) -> Ast.Print.moperator o (program p) (inner_formula f)
     | ListF _  as f -> sprintf "(%s)" (formula f)
   and program = function
     | ListP (a, ps) -> Print.list' "" (sprintf " %s " (Ast.Print.poperator a)) "" inner_program ps
     | Assign _ | Test _ | Converse _ | Kleene _ as p -> inner_program p
   and inner_program = function
     | Assign (a, f) -> sprintf "%s <- %s" (Circuit.Print.callable a) (formula f)
-    | Test f -> sprintf "%s?" (formula f)
+    | Test f -> sprintf "?%s?" (formula f)
     | Converse p -> sprintf "%s^" (program p)
-    | Kleene p -> sprintf "%s*" (program p)
+    | Kleene p -> sprintf "%s\\star" (program p)
     | ListP _ as p -> sprintf "(%s)" (program p)
 end
 
@@ -40,18 +37,18 @@ let concat_map_pairs f l =
 
 let rec extract_dependencies_f = function
   | Circuit.T.CallF c -> [c]
-  | Top -> []
+  | Const _ -> []
   | Neg f -> extract_dependencies_f f
   | ListF (_, f, fs) -> List.concat_map extract_dependencies_f (f :: fs)
-  | Diamond (p, f) -> (extract_dependencies_f f) @(extract_dependencies_p p)
+  | Modal (_, p, f) -> (extract_dependencies_f f) @(extract_dependencies_p p)
 and extract_dependencies_p = function
   | Circuit.T.CallP c -> [c]
   | Assign (_, f) | Test f -> extract_dependencies_f f
   | ListP (_, p, ps) -> List.concat_map extract_dependencies_p (p :: ps)
   | Converse p | Kleene p -> extract_dependencies_p p
 
-let error_f name = eprintf "warning: function %s defined multiple times\n" (Circuit.Print.callable name)
-and error_p name = eprintf "warning: program %s defined multiple times\n" (Circuit.Print.callable name)
+let error_f  name = eprintf "warning: function %s defined multiple times\n" (Circuit.Print.callable name)
+and error_p  name = eprintf "warning: program %s defined multiple times\n"  (Circuit.Print.callable name)
 and error_fp name = eprintf "warning: %s refers to both a program and a function\n" (Circuit.Print.callable name)
 
 let add_decl_f (map_f, dep_map) (c, f) =
@@ -61,7 +58,7 @@ let add_decl_p (map_p, dep_map) (c, p) =
   if CMap.mem c map_p then (error_p c; (map_p, dep_map))
   else (CMap.add c p map_p, (c, extract_dependencies_p p) :: dep_map)
 
-let print_deps = UPrint.list (UPrint.list' "{" ", " "}" Circuit.Print.callable)
+let print_deps = P.list (P.list' "{" ", " "}" Circuit.Print.callable)
 
 let topo_sort decls_f decls_p =
   let names_f, dep_map_f = List.fold_left add_decl_f (CMap.empty, []) decls_f
@@ -87,12 +84,18 @@ let find_p (names_f, names_p) name = match CMap.find_opt name names_p with
 let operator polarity op = if polarity then op else match op with
   | Ast.T.Conj -> Ast.T.Disj
   | Ast.T.Disj -> Ast.T.Conj
+let coperator polarity op = if polarity then op else match op with
+  | Ast.T.Top -> Ast.T.Bot
+  | Ast.T.Bot -> Ast.T.Top
+let moperator polarity op = if polarity then op else match op with
+  | Ast.T.Diamond -> Ast.T.Box
+  | Ast.T.Box -> Ast.T.Diamond
 let rec substitute_f polarity (names_map : formula CMap.t * program CMap.t) = function
   | Circuit.T.CallF c -> find_f polarity names_map c
-  | Top -> Base polarity
+  | Const o -> Const (coperator polarity o)
   | Neg f -> substitute_f (not polarity) names_map f
   | ListF (op, f, fs) -> ListF (operator polarity op, List.map (substitute_f polarity names_map) (f :: fs))
-  | Diamond (p, f) -> Modal (polarity, substitute_p names_map p, substitute_f polarity names_map f)
+  | Modal (mop, p, f) -> Modal (moperator polarity mop, substitute_p names_map p, substitute_f polarity names_map f)
 and substitute_p names_map = function
   | Circuit.T.CallP c -> find_p names_map c
   | Assign (c, f) ->
@@ -129,7 +132,7 @@ let file (decls_f, decls_p, main) =
 let extract_atoms main =
   let rec aux_f set = function
     | CallF (_, a) -> CSet.add a set
-    | Base _ -> set
+    | Const _ -> set
     | ListF (_, fs) -> List.fold_left aux_f set fs
     | Modal (_, p, f) -> aux_f (aux_p set p) f
   and aux_p set = function

@@ -31,10 +31,14 @@ end
 
 let rec formula (mapa, mapf, mapp) = function
   | Circuit.T.CallF c -> if CMap.mem c mapf then CallF (CMap.find c mapf) else (assert (CMap.mem c mapa); Atom (CMap.find c mapa))
-  | Top -> Top
+  | Const Top -> Top
+  | Const Bot -> Neg Top
   | Neg f -> Neg (formula (mapa, mapf, mapp) f)
   | ListF (o, f, fs) -> ListF (o, formula (mapa, mapf, mapp) f, List.map (formula (mapa, mapf, mapp)) fs)
-  | Diamond (p, f) -> Diamond (program (mapa, mapf, mapp) p, formula (mapa, mapf, mapp) f)
+  | Modal (o, p, f) -> let np = program (mapa, mapf, mapp) p
+                       and nf = formula (mapa, mapf, mapp) f in
+                       (match o with Ast.T.Diamond -> Diamond (np, nf)
+                                   | Ast.T.Box -> Neg (Diamond (np, Neg nf)))
 and program (mapa, mapf, mapp) = function
   | Circuit.T.CallP c -> assert (CMap.mem c mapp); CallP (CMap.find c mapp)
   | Assign (c, f) -> assert (CMap.mem c mapa); Assign (CMap.find c mapa, formula (mapa, mapf, mapp) f)
@@ -46,10 +50,10 @@ and program (mapa, mapf, mapp) = function
 let extract_names decls (fdecs, pdecs, _call) =
   let rec aux_f (seta, setf, setp) = function
     | Circuit.T.CallF c -> if List.mem c decls then (seta, CSet.add c setf, setp) else (CSet.add c seta, setf, setp)
-    | Top -> (seta, setf, setp)
+    | Const _ -> (seta, setf, setp)
     | Neg f -> aux_f (seta, setf, setp) f
     | ListF (_, f, fs) -> List.fold_left aux_f (seta, setf, setp) (f :: fs)
-    | Diamond (p, f) -> aux_f (aux_p (seta, setf, setp) p) f
+    | Modal (_, p, f) -> aux_f (aux_p (seta, setf, setp) p) f
   and aux_p (seta, setf, setp) = function
     | Circuit.T.CallP c -> (seta, setf, CSet.add c setp)
     | Assign (a, f) -> aux_f (CSet.add a seta, setf, setp) f

@@ -15,14 +15,14 @@ struct
 
   let rec formula f = inner_formula f
   and outer_formula = function
-    | Top -> "\\top"
+    | Const c -> Ast.Print.coperator c
     | CallF a -> callable a
     | Neg f -> sprintf "\\neg %s" (outer_formula f)
-    | Diamond (p, f) -> sprintf "<%s>%s" (program p) (outer_formula f)
+    | Modal (o, p, f) -> Ast.Print.moperator o (program p) (outer_formula f)
     | ListF (_, f, []) -> outer_formula f
     | ListF _  as f -> sprintf "(%s)" (inner_formula f)
   and inner_formula = function
-    | Top | CallF _ | Neg _ | Diamond _ as f -> outer_formula f
+    | Const _ | CallF _ | Neg _ | Modal _ as f -> outer_formula f
     | ListF (a, f, fs) -> Print.list' "" (sprintf " %s " (Ast.Print.foperator a)) "" outer_formula (f :: fs)
   and program = function
     | ListP (a, p, ps) -> Print.list' "" (sprintf " %s " (Ast.Print.poperator a)) "" inner_program (p :: ps)
@@ -167,16 +167,16 @@ and callable gmap vmap = function
 
 let rec formula gmap vmap : Ast.T.formula -> T.formula = function
   | Ast.T.CallF c -> CallF (callable gmap vmap c)
-  | Top -> Top
+  | Const c -> Const c
   | Neg f -> Neg (formula gmap vmap f)
   | ListF (fop, f, fs) -> ListF (fop, formula gmap vmap f, List.map (formula gmap vmap) fs)
   | BigF (fop, vs, f) ->
      let vmaps = vdecls gmap vmap vs in
      let fs = List.map (fun m -> formula gmap m f) vmaps in
      (match fs with
-     | [] -> (match fop with Ast.T.Conj -> Top | Ast.T.Disj -> Neg Top)
+     | [] -> Const (match fop with Ast.T.Conj -> Top | Ast.T.Disj -> Bot)
      | hd :: tl -> ListF (fop, hd, tl))
-  | Diamond (p, f) -> Diamond (program gmap vmap p, formula gmap vmap f)
+  | Modal (m, p, f) -> Modal (m, program gmap vmap p, formula gmap vmap f)
 
 and program gmap vmap : Ast.T.program -> T.program = function
   | Ast.T.Assign (c, f) -> Assign (callable gmap vmap c, formula gmap vmap f)
@@ -187,7 +187,7 @@ and program gmap vmap : Ast.T.program -> T.program = function
      let vmaps = vdecls gmap vmap vs in
      let ps = List.map (fun m -> program gmap m p) vmaps in
      (match ps with
-      | [] -> Test Top
+      | [] -> Test (Const Top)
       | p :: tl -> ListP (pop, p, tl))
   | Converse p -> Converse (program gmap vmap p)
   | Kleene p -> Kleene (program gmap vmap p)
