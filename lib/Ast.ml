@@ -69,7 +69,7 @@ struct
     | Var n -> n
   and expr = function
     | ListE (a, e, es) -> Print.list' "" (sprintf " %s " (eoperator a)) "" inner_expr (e :: es)
-    | BigE (a, vs, e) -> sprintf "%s %s, %s" (bigeoperator a) (vdecls vs) (expr e)
+    | BigE (a, vs, e) -> sprintf "%s %s: %s" (bigeoperator a) (vdecls vs) (expr e)
     | Subtract (v, vs) -> Print.list' "" " - " "" inner_expr (v :: vs)
     | VarE _ | Int _ as e -> inner_expr e
   and inner_expr = function
@@ -84,7 +84,7 @@ struct
   let rec formula = function
     | Top | CallF _ | Neg _ | Diamond _ as f -> inner_formula f
     | ListF (a, f, fs) -> Print.list' "" (sprintf " %s " (foperator a)) "" inner_formula (f :: fs)
-    | BigF (a, vs, f) -> sprintf "%s %s, %s" (bigfoperator a) (vdecls vs) (formula f)
+    | BigF (a, vs, f) -> sprintf "%s %s: %s" (bigfoperator a) (vdecls vs) (formula f)
   and inner_formula = function
     | Top -> "\\top"
     | CallF a -> callable a
@@ -93,7 +93,7 @@ struct
     | ListF _ | BigF _  as f -> sprintf "(%s)" (formula f)
   and program = function
     | ListP (a, p, ps) -> Print.list' "" (sprintf " %s " (poperator a)) "" inner_program (p :: ps)
-    | BigP (a, vs, p) -> sprintf "%s %s, %s" (bigpoperator a) (vdecls vs) (program p)
+    | BigP (a, vs, p) -> sprintf "%s %s: %s" (bigpoperator a) (vdecls vs) (program p)
     | CallP _ | Assign _ | Test _ | Converse _ | Kleene _ as p -> inner_program p
   and inner_program = function
     | CallP a -> callable a
@@ -105,7 +105,7 @@ struct
 
   let forall_decls vs = match vs with
     | [] -> ""
-    | _ :: _ -> sprintf "\\forall %s, " (vdecls vs)
+    | _ :: _ -> sprintf "\\forall %s: " (vdecls vs)
   let decl pr (vs, c, a) = sprintf "%s%s := %s." (forall_decls vs) (callable c) (pr a)
   let main_decl m = sprintf "%s." (callable m)
 
