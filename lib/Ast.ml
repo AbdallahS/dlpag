@@ -115,5 +115,5 @@ struct
   let decl pr (vs, c, a) = sprintf "%s%s := %s." (forall_decls vs) (callable c) (pr a)
   let main_decl m = sprintf "%s." (callable m)
 
-  let file (gs, fs, ps, m) = sprintf "grounding:\n%s\nformula:\n%s\nprogram:\n%smain:\n%s" (Print.unlines (decl set) gs) (Print.unlines (decl formula) fs) (Print.unlines (decl program) ps) (main_decl m)
+  let file (gs, fs, ps, m) = sprintf "grounding:\n%s\n\nformula:\n%s\n\nprogram:\n\n%smain:\n%s" (Print.unlines (decl set) gs) (Print.unlines (decl formula) fs) (Print.unlines (decl program) ps) (main_decl m)
 end
