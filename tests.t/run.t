@@ -1,43 +1,43 @@
-  $ ../bin/Dlpag.exe ut_and.pa
+  $ ../bin/Main.exe ut_and.pa
   false
-  $ ../bin/Dlpag.exe ut_assign.pa
+  $ ../bin/Main.exe ut_assign.pa
   true
-  $ ../bin/Dlpag.exe ut_bracket.pa
+  $ ../bin/Main.exe ut_bracket.pa
   false
-  $ ../bin/Dlpag.exe ut_call2.pa
+  $ ../bin/Main.exe ut_call2.pa
   true
-  $ ../bin/Dlpag.exe ut_call_form.pa
+  $ ../bin/Main.exe ut_call_form.pa
   true
-  $ ../bin/Dlpag.exe ut_call.pa
+  $ ../bin/Main.exe ut_call.pa
   false
-  $ ../bin/Dlpag.exe ut_call_prog.pa
+  $ ../bin/Main.exe ut_call_prog.pa
   true
-  $ ../bin/Dlpag.exe ut_neg_call.pa
+  $ ../bin/Main.exe ut_neg_call.pa
   true
-  $ ../bin/Dlpag.exe ut_neg_or.pa
+  $ ../bin/Main.exe ut_neg_or.pa
   true
-  $ ../bin/Dlpag.exe ut_neg.pa
+  $ ../bin/Main.exe ut_neg.pa
   true
-  $ ../bin/Dlpag.exe ut_or.pa
+  $ ../bin/Main.exe ut_or.pa
   true
-  $ ../bin/Dlpag.exe ut_seq.pa
+  $ ../bin/Main.exe ut_seq.pa
   true
-  $ ../bin/Dlpag.exe ut_star_cmplx.pa
+  $ ../bin/Main.exe ut_star_cmplx.pa
   true
-  $ ../bin/Dlpag.exe ut_star.pa
+  $ ../bin/Main.exe ut_star.pa
   true
-  $ ../bin/Dlpag.exe ut_test2.pa
+  $ ../bin/Main.exe ut_test2.pa
   true
-  $ ../bin/Dlpag.exe ut_test_call.pa
+  $ ../bin/Main.exe ut_test_call.pa
   false
-  $ ../bin/Dlpag.exe ut_test_cmplx.pa
+  $ ../bin/Main.exe ut_test_cmplx.pa
   true
-  $ ../bin/Dlpag.exe ut_test_false.pa
+  $ ../bin/Main.exe ut_test_false.pa
   false
-  $ ../bin/Dlpag.exe ut_test.pa
+  $ ../bin/Main.exe ut_test.pa
   true
-  $ ../bin/Dlpag.exe ut_two_diamonds.pa
+  $ ../bin/Main.exe ut_two_diamonds.pa
   true
-  $ ../bin/Dlpag.exe ut_union.pa
+  $ ../bin/Main.exe ut_union.pa
   true
 

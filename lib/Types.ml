@@ -38,6 +38,20 @@ type 'a decl = callable * 'a
 type file = formula decl list * program decl list * callable
 end end
 
+module QCIR = struct module T = struct
+type var = string
+type literal = bool * string
+type operator = And | Or
+type quant = Exists | Forall
+type gate_body = Group of (operator * literal list) | Xor of (literal * literal) | Ite of (literal * literal * literal) | Quantifier of (quant * var list * literal)
+type gate_statement = var * gate_body
+type qblock = quant * var list
+type file = { free_vars : var list;
+              qblocks : qblock list;
+              output : literal;
+              gates : gate_statement list }
+end end
+
 module FORMULA = struct module T = struct
 type formula = CallF of (bool * CIRCUIT.T.callable) | Const of AST.T.coperator | ListF of (AST.T.foperator * formula list) | Modal of (AST.T.moperator * program * formula)
 and program  = Assign of (CIRCUIT.T.callable * formula) | Test of formula | ListP of (AST.T.poperator * program list) | Converse of program | Kleene of program

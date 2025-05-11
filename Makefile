@@ -7,7 +7,8 @@ clean:
 	dune clean
 
 dlpag:
-	dune build bin/Dlpag.exe
+	dune build bin/QcirPrenexer.exe
+	dune build bin/Main.exe
 
 install:
 	dune build @install
@@ -22,3 +23,6 @@ uninstall:
 
 errorfile:
 	menhir --list-errors lib/Parser.mly > lib/Parser.messages
+
+errorfile_qcir:
+	menhir --list-errors lib/ParserQCIR.mly > lib/ParserQCIR.messages

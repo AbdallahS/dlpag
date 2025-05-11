@@ -1,16 +1,7 @@
 open Printf
 
-type var = string
-type literal = bool * string
-type operator = And | Or
-type quant = Exists | Forall
-type gate_body = Group of (operator * literal list) | Xor of (literal * literal) | Ite of (literal * literal * literal) | Quantifier of (quant * var list * literal)
-type gate_statement = var * gate_body
-type qblock = quant * var list
-type file = { free_vars : var list;
-              qblocks : qblock list;
-              output : literal;
-              gates : gate_statement list }
+include Types.QCIR
+open T
 
 module UPrint = Print
 module Print = struct
@@ -34,7 +25,7 @@ module Print = struct
   let output lit = sprintf "output(%s)\n" (literal lit)
   let format_id = "#QCIR-G14\n"
   let file f =
-    sprintf "%s%s%s%s%s"
+    sprintf "%s%s%s\n%s%s"
       format_id
       (free_vars f.free_vars)
       (UPrint.unlines qblock f.qblocks)

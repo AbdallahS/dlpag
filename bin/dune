@@ -1,4 +1,9 @@
-(executable
- (name Dlpag)
- (public_name dlpag)
+;(executables
+; (names QcirPrenexer)
+; (public_names qcirprenexer)
+; (libraries dlpag))
+
+(executables
+ (names Main QcirPrenexer)
+ (public_names dlpag qcirprenexer)
  (libraries dlpag))

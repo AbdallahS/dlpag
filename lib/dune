@@ -1,11 +1,16 @@
-(ocamllex Lexer)
+(ocamllex Lexer LexerQCIR)
 (menhir
  (flags --table --explain)
- (modules Parser))
+ (modules Parser ParserQCIR))
 
 (rule
  (targets ParserMessages.ml)
  (deps Parser.messages Parser.mly)
+ (action  (with-stdout-to %{targets} (run menhir --compile-errors %{deps}))))
+
+(rule
+ (targets ParserMessagesQCIR.ml)
+ (deps ParserQCIR.messages ParserQCIR.mly)
  (action  (with-stdout-to %{targets} (run menhir --compile-errors %{deps}))))
 
 (library

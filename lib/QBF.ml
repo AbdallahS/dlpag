@@ -1,7 +1,7 @@
 open Printf
 
 type callable = Circuit.T.callable * int
-type formula = Atom of (bool * callable) | Quantifier of (QCIR.quant * callable list * formula) | ListQ of (Ast.T.foperator * formula list) | Xor of (formula * formula) | Ite of (formula * formula * formula)
+type formula = Atom of (bool * callable) | Quantifier of (QCIR.T.quant * callable list * formula) | ListQ of (Ast.T.foperator * formula list) | Xor of (formula * formula) | Ite of (formula * formula * formula)
 
 type context = { n : int;
                  vars : Circuit.T.callable list }
@@ -56,12 +56,12 @@ let rec reduction_f context vx = function
   | ListF (op, fs) -> ListQ (op, List.map (reduction_f context vx) fs)
   | Modal (Ast.T.Diamond, p, f) ->
      let vary, vy = new_valuation context in
-     Quantifier (QCIR.Exists, vary, conj2 (reduction_g context vx vy p) (reduction_f context vy f))
+     Quantifier (QCIR.T.Exists, vary, conj2 (reduction_g context vx vy p) (reduction_f context vy f))
   | Modal (Ast.T.Box, p, f) ->
      let vary, vy = new_valuation context in
      let prog = reduction_g context vx vy p
      and form = reduction_f context vy f in
-     Quantifier (QCIR.Forall, vary, Ite (prog, form, bottom))
+     Quantifier (QCIR.T.Forall, vary, Ite (prog, form, bottom))
 
 and reduction_g context vx vy = function
   | Formula.T.Assign (name, f) -> assign context vx vy name (reduction_f context vx f)
@@ -82,7 +82,7 @@ and reduction_h context m vx vy p =
     let ite_else = ListQ (Ast.T.Conj, (make_equiv context vx1 vz) @ (make_equiv context vy1 vy)) in
     let ite = Ite (Atom (true, vart), ite_then, ite_else) in
     let conj = [reduction_h context (m-1) vx1 vy1 p; ite] in
-    Quantifier (QCIR.Exists, varz, Quantifier (QCIR.Forall, [vart], Quantifier (QCIR.Exists, varx1 @ vary1, ListQ (Ast.T.Conj, conj))))
+    Quantifier (QCIR.T.Exists, varz, Quantifier (QCIR.T.Forall, [vart], Quantifier (QCIR.T.Exists, varx1 @ vary1, ListQ (Ast.T.Conj, conj))))
 
 and reduction_i context vx vy ps = match ps with
   | [] -> assert false
@@ -91,7 +91,7 @@ and reduction_i context vx vy ps = match ps with
      let varz,  vz  = new_valuation context in
      let first_step = reduction_g context vx vz pa in
      let rest_step = reduction_i context vz vy rest in
-     Quantifier (QCIR.Exists, varz, conj2 first_step rest_step)
+     Quantifier (QCIR.T.Exists, varz, conj2 first_step rest_step)
 
 let form main =
   let vars = Formula.extract_atoms main in
@@ -132,33 +132,33 @@ let to_qcir f =
     | Quantifier (q, cs, f) ->
        let cs = List.map Print.callable cs in
        let l = aux f in
-       let g = QCIR.Quantifier (q, cs, l) in
+       let g = QCIR.T.Quantifier (q, cs, l) in
        let gn = new_gate () in
        Stack.push (gn, g) gates;
        (true, gn)
     | ListQ (o, fs) ->
        let ls = List.map aux fs in
-       let op = match o with Ast.T.Conj -> QCIR.And | Ast.T.Disj -> QCIR.Or in
-       let g = QCIR.Group (op, ls) in
+       let op = match o with Ast.T.Conj -> QCIR.T.And | Ast.T.Disj -> QCIR.T.Or in
+       let g = QCIR.T.Group (op, ls) in
        let gn = new_gate () in
        Stack.push (gn, g) gates;
        (true, gn)
     | Xor (f1, f2) ->
        let l1, l2 = aux f1, aux f2 in
-       let g = QCIR.Xor (l1, l2) in
+       let g = QCIR.T.Xor (l1, l2) in
        let gn = new_gate () in
        Stack.push (gn, g) gates;
        (true, gn)
     | Ite (f1, f2, f3) ->
        let l1, l2, l3 = aux f1, aux f2, aux f3 in
-       let g = QCIR.Ite (l1, l2, l3) in
+       let g = QCIR.T.Ite (l1, l2, l3) in
        let gn = new_gate () in
        Stack.push (gn, g) gates;
        (true, gn) in
   let output = aux f in
   let gates = List.of_seq (Stack.to_seq gates) in
   let gates = List.rev gates in
-  { QCIR.free_vars = [];
+  { QCIR.T.free_vars = [];
     qblocks = [];
     output;
     gates }

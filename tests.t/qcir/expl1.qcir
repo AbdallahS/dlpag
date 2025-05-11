@@ -1,0 +1,7 @@
+#QCIR-14
+output(g5)
+g1 = xor(x, z)
+g2 = exists(x; g1)
+g3 = xor(z, g2)
+g4 = and(g2, g3)
+g5 = forall(z; g4)

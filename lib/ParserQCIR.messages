@@ -1,0 +1,592 @@
+file: XOR
+##
+## Ends in an error in state: 0.
+##
+## file' -> . file [ # ]
+##
+## The known suffix of the stack is as follows:
+##
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT XOR
+##
+## Ends in an error in state: 1.
+##
+## formatId -> FORMAT . NEWLINE [ OUTPUT LPAREN FORALL EXISTS ]
+##
+## The known suffix of the stack is as follows:
+## FORMAT
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE XOR
+##
+## Ends in an error in state: 3.
+##
+## file -> formatId . qblockPrefix outputStmt list(gateStmt) EOF [ # ]
+##
+## The known suffix of the stack is as follows:
+## formatId
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE LPAREN XOR
+##
+## Ends in an error in state: 4.
+##
+## qblockPrefix -> LPAREN . FREE LPAREN separated_nonempty_list(COMMA,VAR) RPAREN list(qblockQuant) [ OUTPUT ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE LPAREN FREE XOR
+##
+## Ends in an error in state: 5.
+##
+## qblockPrefix -> LPAREN FREE . LPAREN separated_nonempty_list(COMMA,VAR) RPAREN list(qblockQuant) [ OUTPUT ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN FREE
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE LPAREN FREE LPAREN XOR
+##
+## Ends in an error in state: 6.
+##
+## qblockPrefix -> LPAREN FREE LPAREN . separated_nonempty_list(COMMA,VAR) RPAREN list(qblockQuant) [ OUTPUT ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN FREE LPAREN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE EXISTS LPAREN VAR XOR
+##
+## Ends in an error in state: 7.
+##
+## separated_nonempty_list(COMMA,VAR) -> VAR . [ SEMICOLON RPAREN ]
+## separated_nonempty_list(COMMA,VAR) -> VAR . COMMA separated_nonempty_list(COMMA,VAR) [ SEMICOLON RPAREN ]
+##
+## The known suffix of the stack is as follows:
+## VAR
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE EXISTS LPAREN VAR COMMA XOR
+##
+## Ends in an error in state: 8.
+##
+## separated_nonempty_list(COMMA,VAR) -> VAR COMMA . separated_nonempty_list(COMMA,VAR) [ SEMICOLON RPAREN ]
+##
+## The known suffix of the stack is as follows:
+## VAR COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE LPAREN FREE LPAREN VAR SEMICOLON
+##
+## Ends in an error in state: 10.
+##
+## qblockPrefix -> LPAREN FREE LPAREN separated_nonempty_list(COMMA,VAR) . RPAREN list(qblockQuant) [ OUTPUT ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN FREE LPAREN separated_nonempty_list(COMMA,VAR)
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 7, spurious reduction of production separated_nonempty_list(COMMA,VAR) -> VAR
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE LPAREN FREE LPAREN VAR RPAREN XOR
+##
+## Ends in an error in state: 11.
+##
+## qblockPrefix -> LPAREN FREE LPAREN separated_nonempty_list(COMMA,VAR) RPAREN . list(qblockQuant) [ OUTPUT ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN FREE LPAREN separated_nonempty_list(COMMA,VAR) RPAREN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE EXISTS XOR
+##
+## Ends in an error in state: 14.
+##
+## qblockQuant -> quant . LPAREN separated_nonempty_list(COMMA,VAR) RPAREN NEWLINE [ OUTPUT FORALL EXISTS ]
+##
+## The known suffix of the stack is as follows:
+## quant
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE EXISTS LPAREN XOR
+##
+## Ends in an error in state: 15.
+##
+## qblockQuant -> quant LPAREN . separated_nonempty_list(COMMA,VAR) RPAREN NEWLINE [ OUTPUT FORALL EXISTS ]
+##
+## The known suffix of the stack is as follows:
+## quant LPAREN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE EXISTS LPAREN VAR SEMICOLON
+##
+## Ends in an error in state: 16.
+##
+## qblockQuant -> quant LPAREN separated_nonempty_list(COMMA,VAR) . RPAREN NEWLINE [ OUTPUT FORALL EXISTS ]
+##
+## The known suffix of the stack is as follows:
+## quant LPAREN separated_nonempty_list(COMMA,VAR)
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 7, spurious reduction of production separated_nonempty_list(COMMA,VAR) -> VAR
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE EXISTS LPAREN VAR RPAREN XOR
+##
+## Ends in an error in state: 17.
+##
+## qblockQuant -> quant LPAREN separated_nonempty_list(COMMA,VAR) RPAREN . NEWLINE [ OUTPUT FORALL EXISTS ]
+##
+## The known suffix of the stack is as follows:
+## quant LPAREN separated_nonempty_list(COMMA,VAR) RPAREN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE EXISTS LPAREN VAR RPAREN NEWLINE XOR
+##
+## Ends in an error in state: 19.
+##
+## list(qblockQuant) -> qblockQuant . list(qblockQuant) [ OUTPUT ]
+##
+## The known suffix of the stack is as follows:
+## qblockQuant
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT XOR
+##
+## Ends in an error in state: 23.
+##
+## outputStmt -> OUTPUT . LPAREN lit RPAREN NEWLINE [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## OUTPUT
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN XOR
+##
+## Ends in an error in state: 24.
+##
+## outputStmt -> OUTPUT LPAREN . lit RPAREN NEWLINE [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## OUTPUT LPAREN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN NEG XOR
+##
+## Ends in an error in state: 26.
+##
+## lit -> NEG . VAR [ RPAREN COMMA ]
+##
+## The known suffix of the stack is as follows:
+## NEG
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR XOR
+##
+## Ends in an error in state: 28.
+##
+## outputStmt -> OUTPUT LPAREN lit . RPAREN NEWLINE [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## OUTPUT LPAREN lit
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN XOR
+##
+## Ends in an error in state: 29.
+##
+## outputStmt -> OUTPUT LPAREN lit RPAREN . NEWLINE [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## OUTPUT LPAREN lit RPAREN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE XOR
+##
+## Ends in an error in state: 31.
+##
+## file -> formatId qblockPrefix outputStmt . list(gateStmt) EOF [ # ]
+##
+## The known suffix of the stack is as follows:
+## formatId qblockPrefix outputStmt
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR XOR
+##
+## Ends in an error in state: 32.
+##
+## gateStmt -> VAR . EQUAL AND LPAREN loption(separated_nonempty_list(COMMA,lit)) RPAREN [ VAR EOF ]
+## gateStmt -> VAR . EQUAL OR LPAREN loption(separated_nonempty_list(COMMA,lit)) RPAREN [ VAR EOF ]
+## gateStmt -> VAR . EQUAL XOR LPAREN lit COMMA lit RPAREN [ VAR EOF ]
+## gateStmt -> VAR . EQUAL ITE LPAREN lit COMMA lit COMMA lit RPAREN [ VAR EOF ]
+## gateStmt -> VAR . EQUAL quant LPAREN separated_nonempty_list(COMMA,VAR) SEMICOLON lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL VAR
+##
+## Ends in an error in state: 33.
+##
+## gateStmt -> VAR EQUAL . AND LPAREN loption(separated_nonempty_list(COMMA,lit)) RPAREN [ VAR EOF ]
+## gateStmt -> VAR EQUAL . OR LPAREN loption(separated_nonempty_list(COMMA,lit)) RPAREN [ VAR EOF ]
+## gateStmt -> VAR EQUAL . XOR LPAREN lit COMMA lit RPAREN [ VAR EOF ]
+## gateStmt -> VAR EQUAL . ITE LPAREN lit COMMA lit COMMA lit RPAREN [ VAR EOF ]
+## gateStmt -> VAR EQUAL . quant LPAREN separated_nonempty_list(COMMA,VAR) SEMICOLON lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL XOR XOR
+##
+## Ends in an error in state: 34.
+##
+## gateStmt -> VAR EQUAL XOR . LPAREN lit COMMA lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL XOR
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL XOR LPAREN XOR
+##
+## Ends in an error in state: 35.
+##
+## gateStmt -> VAR EQUAL XOR LPAREN . lit COMMA lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL XOR LPAREN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL XOR LPAREN VAR XOR
+##
+## Ends in an error in state: 36.
+##
+## gateStmt -> VAR EQUAL XOR LPAREN lit . COMMA lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL XOR LPAREN lit
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL XOR LPAREN VAR COMMA XOR
+##
+## Ends in an error in state: 37.
+##
+## gateStmt -> VAR EQUAL XOR LPAREN lit COMMA . lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL XOR LPAREN lit COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL XOR LPAREN VAR COMMA VAR XOR
+##
+## Ends in an error in state: 38.
+##
+## gateStmt -> VAR EQUAL XOR LPAREN lit COMMA lit . RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL XOR LPAREN lit COMMA lit
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL OR XOR
+##
+## Ends in an error in state: 40.
+##
+## gateStmt -> VAR EQUAL OR . LPAREN loption(separated_nonempty_list(COMMA,lit)) RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL OR
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL OR LPAREN XOR
+##
+## Ends in an error in state: 41.
+##
+## gateStmt -> VAR EQUAL OR LPAREN . loption(separated_nonempty_list(COMMA,lit)) RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL OR LPAREN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL AND LPAREN VAR XOR
+##
+## Ends in an error in state: 45.
+##
+## separated_nonempty_list(COMMA,lit) -> lit . [ RPAREN ]
+## separated_nonempty_list(COMMA,lit) -> lit . COMMA separated_nonempty_list(COMMA,lit) [ RPAREN ]
+##
+## The known suffix of the stack is as follows:
+## lit
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL AND LPAREN VAR COMMA XOR
+##
+## Ends in an error in state: 46.
+##
+## separated_nonempty_list(COMMA,lit) -> lit COMMA . separated_nonempty_list(COMMA,lit) [ RPAREN ]
+##
+## The known suffix of the stack is as follows:
+## lit COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL ITE XOR
+##
+## Ends in an error in state: 48.
+##
+## gateStmt -> VAR EQUAL ITE . LPAREN lit COMMA lit COMMA lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL ITE
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL ITE LPAREN XOR
+##
+## Ends in an error in state: 49.
+##
+## gateStmt -> VAR EQUAL ITE LPAREN . lit COMMA lit COMMA lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL ITE LPAREN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL ITE LPAREN VAR XOR
+##
+## Ends in an error in state: 50.
+##
+## gateStmt -> VAR EQUAL ITE LPAREN lit . COMMA lit COMMA lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL ITE LPAREN lit
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL ITE LPAREN VAR COMMA XOR
+##
+## Ends in an error in state: 51.
+##
+## gateStmt -> VAR EQUAL ITE LPAREN lit COMMA . lit COMMA lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL ITE LPAREN lit COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL ITE LPAREN VAR COMMA VAR XOR
+##
+## Ends in an error in state: 52.
+##
+## gateStmt -> VAR EQUAL ITE LPAREN lit COMMA lit . COMMA lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL ITE LPAREN lit COMMA lit
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL ITE LPAREN VAR COMMA VAR COMMA XOR
+##
+## Ends in an error in state: 53.
+##
+## gateStmt -> VAR EQUAL ITE LPAREN lit COMMA lit COMMA . lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL ITE LPAREN lit COMMA lit COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL ITE LPAREN VAR COMMA VAR COMMA VAR XOR
+##
+## Ends in an error in state: 54.
+##
+## gateStmt -> VAR EQUAL ITE LPAREN lit COMMA lit COMMA lit . RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL ITE LPAREN lit COMMA lit COMMA lit
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL AND XOR
+##
+## Ends in an error in state: 56.
+##
+## gateStmt -> VAR EQUAL AND . LPAREN loption(separated_nonempty_list(COMMA,lit)) RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL AND
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL AND LPAREN XOR
+##
+## Ends in an error in state: 57.
+##
+## gateStmt -> VAR EQUAL AND LPAREN . loption(separated_nonempty_list(COMMA,lit)) RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL AND LPAREN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL EXISTS XOR
+##
+## Ends in an error in state: 60.
+##
+## gateStmt -> VAR EQUAL quant . LPAREN separated_nonempty_list(COMMA,VAR) SEMICOLON lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL quant
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL EXISTS LPAREN XOR
+##
+## Ends in an error in state: 61.
+##
+## gateStmt -> VAR EQUAL quant LPAREN . separated_nonempty_list(COMMA,VAR) SEMICOLON lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL quant LPAREN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL EXISTS LPAREN VAR RPAREN
+##
+## Ends in an error in state: 62.
+##
+## gateStmt -> VAR EQUAL quant LPAREN separated_nonempty_list(COMMA,VAR) . SEMICOLON lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL quant LPAREN separated_nonempty_list(COMMA,VAR)
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 7, spurious reduction of production separated_nonempty_list(COMMA,VAR) -> VAR
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL EXISTS LPAREN VAR SEMICOLON XOR
+##
+## Ends in an error in state: 63.
+##
+## gateStmt -> VAR EQUAL quant LPAREN separated_nonempty_list(COMMA,VAR) SEMICOLON . lit RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL quant LPAREN separated_nonempty_list(COMMA,VAR) SEMICOLON
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL EXISTS LPAREN VAR SEMICOLON VAR XOR
+##
+## Ends in an error in state: 64.
+##
+## gateStmt -> VAR EQUAL quant LPAREN separated_nonempty_list(COMMA,VAR) SEMICOLON lit . RPAREN [ VAR EOF ]
+##
+## The known suffix of the stack is as follows:
+## VAR EQUAL quant LPAREN separated_nonempty_list(COMMA,VAR) SEMICOLON lit
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+file: FORMAT NEWLINE OUTPUT LPAREN VAR RPAREN NEWLINE VAR EQUAL AND LPAREN RPAREN XOR
+##
+## Ends in an error in state: 68.
+##
+## list(gateStmt) -> gateStmt . list(gateStmt) [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## gateStmt
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+

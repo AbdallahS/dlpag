@@ -5,7 +5,7 @@ phi := <pi2> psi.
 psi := (a \or b) \or \neg \top.
 
 program:
-pi := b <- \neg b*.
+pi := b <- \neg b\star.
 pi2 := (a <- \neg (b \and c) \seq pi) \cup c <- \top.
 
 main:
